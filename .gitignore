@@ -338,3 +338,15 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/Library
+/ProjectSettings
+/Temp
+/NavMeshComponentsTestsPlaymode.csproj
+/NavMeshComponentsTestsEditmode.csproj
+/NavMeshComponentsExamplesEditor.csproj
+/NavMeshComponentsExamples.csproj
+/NavMeshComponentsEditor.csproj
+/NavMeshComponents.csproj
+/CS521_A3.sln
+/Assembly-CSharp.csproj
+/Assembly-CSharp-Editor.csproj
