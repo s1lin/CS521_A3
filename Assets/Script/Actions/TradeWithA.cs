@@ -10,13 +10,21 @@ class TradeWithA : GoapAction {
     private bool isTrade = false;
     private float startTime = 0;
     public float tradeDuration = 0.5f; // seconds
-    
-    public TradeWithA() {
-        addPrecondition("hasTwoCapacity", true);
-        addEffect("hasTwoTu", true);
+
+    public Inventory inventory;
+    void Start() {
+        inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
+        addPrecondition("Capacity", 2);
+        addEffect("InTu", 2);
+        addEffect("Capacity", -2);
     }
-    public override bool checkProceduralPrecondition(GameObject agent) {
-        throw new NotImplementedException();
+
+    public override bool checkProceduralPrecondition(HashSet<KeyValuePair<string, object>> state) {
+        foreach(KeyValuePair<string, object> s in state) {
+            if (s.Key.Equals("Capacity"))
+                return (int)s.Value >= 2;
+        }
+        return false;
     }
 
     public override bool isDone() {
@@ -24,6 +32,7 @@ class TradeWithA : GoapAction {
     }
 
     public override bool perform(GameObject agent) {
+
         if (startTime == 0)
             startTime = Time.time;
 
@@ -32,6 +41,8 @@ class TradeWithA : GoapAction {
             Inventory inventory = agent.GetComponent<Inventory>();
             inventory.GetItemFromTrader(SpiceName.Tu, 2);
         }
+        isTrade = true;
+        //target = targetChoppingBlock.gameObject;
         return true;
     }
 
@@ -41,6 +52,7 @@ class TradeWithA : GoapAction {
 
     public override void reset() {
         startTime = 0;
+        isTrade = false;
     }
 }
 

@@ -10,14 +10,23 @@ class TradeWithD : GoapAction {
     private bool isTrade = false;
     private float startTime = 0;
     public float tradeDuration = 0.5f; // seconds
-    
-    public TradeWithD() {
-        
-        addPrecondition("hasFourTu", true);
-        addEffect("hasOneCi", true);
+
+    public Inventory inventory;
+    void Start() {
+        inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
+
+        addPrecondition("InTu", 4);
+
+        addEffect("InTu", -4);
+        addEffect("InCi", 1);
+        addEffect("Capacity", 3);
     }
-    public override bool checkProceduralPrecondition(GameObject agent) {
-        throw new NotImplementedException();
+    public override bool checkProceduralPrecondition(HashSet<KeyValuePair<string, object>> state) {
+        foreach (KeyValuePair<string, object> s in state) {
+            if (s.Key.Equals("InTu"))
+                return (int)s.Value == 4;
+        }
+        return false;
     }
 
     public override bool isDone() {
@@ -33,6 +42,7 @@ class TradeWithD : GoapAction {
             Inventory inventory = agent.GetComponent<Inventory>();
             if (inventory.RemoveItem(SpiceName.Tu, 4)) {
                 inventory.GetItemFromTrader(SpiceName.Ci, 1);
+                isTrade = true;
                 return true;
             }
             return false;
@@ -46,6 +56,7 @@ class TradeWithD : GoapAction {
 
     public override void reset() {
         startTime = 0;
+        isTrade = false;
     }
 }
 

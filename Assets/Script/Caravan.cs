@@ -9,10 +9,20 @@ public class Caravan : MonoBehaviour {
     private Inventory inventory;
 
     private Text caravanText;
-    private int tu, sa, ca, ci, cl, pe, su;
- 
+
+    public Caravan() {
+        items = new Dictionary<SpiceName, int> {
+            { SpiceName.Tu, 0 },
+            { SpiceName.Sa, 0 },
+            { SpiceName.Ca, 0 },
+            { SpiceName.Ci, 0 },
+            { SpiceName.Cl, 0 },
+            { SpiceName.Pe, 0 },
+            { SpiceName.Su, 0 }
+        };
+    }
+
     void Start() {
-        items = new Dictionary<SpiceName, int>();
         inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
     }
 
@@ -67,7 +77,7 @@ public class Caravan : MonoBehaviour {
                 value--;
                 items.Remove(name);
                 items.Add(name, value);
-                
+
                 caravanText = GameObject.FindGameObjectWithTag(SpiceNames.ToString(name) + "_c").GetComponent<Text>();
                 caravanText.text = string.Format("{0}", value);
             }

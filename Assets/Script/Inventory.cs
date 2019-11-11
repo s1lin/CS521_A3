@@ -10,8 +10,18 @@ public class Inventory : MonoBehaviour {
     private Caravan caravan;
     private Text inventoryText;
 
-    void Start() {
-        items = new Dictionary<SpiceName, int>();
+    public Inventory() {
+        items = new Dictionary<SpiceName, int> {
+            { SpiceName.Tu, 0 },
+            { SpiceName.Sa, 0 },
+            { SpiceName.Ca, 0 },
+            { SpiceName.Ci, 0 },
+            { SpiceName.Cl, 0 },
+            { SpiceName.Pe, 0 },
+            { SpiceName.Su, 0 }
+        };
+    }
+    void Start() {      
         caravan = GameObject.FindGameObjectWithTag("Caravan").GetComponent<Caravan>();
     }
 

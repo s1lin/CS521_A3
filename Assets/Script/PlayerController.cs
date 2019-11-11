@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour, IGoap {
@@ -12,10 +13,20 @@ public class PlayerController : MonoBehaviour, IGoap {
     private Inventory inventory;
     private Caravan caravan;
     private Trader traders;
+    private GameObject plan;
+
+    void Start() {
+        traders = GameObject.FindGameObjectWithTag("traders").GetComponent<Trader>();
+        caravan = GameObject.FindGameObjectWithTag("Caravan").GetComponent<Caravan>();
+        inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
+        plan = GameObject.FindGameObjectWithTag("Plans");
+    }
 
     public HashSet<KeyValuePair<string, object>> createGoalState() {
         HashSet<KeyValuePair<string, object>> goal = new HashSet<KeyValuePair<string, object>> {
-            new KeyValuePair<string, object>("isWin", true)
+            new KeyValuePair<string, object>("CaTu", 2)
+            //new KeyValuePair<string, object>("CaSa", 2),
+            //new KeyValuePair<string, object>("Ci", 2)
         };
         return goal;
     }
@@ -32,15 +43,26 @@ public class PlayerController : MonoBehaviour, IGoap {
     }
 
     public void planAborted(GoapAction aborter) {
-        throw new System.NotImplementedException();
+        Debug.Log("<color=red>Plan Aborted</color> " + GoapAgent.prettyPrint(aborter));
     }
 
     public void planFailed(HashSet<KeyValuePair<string, object>> failedGoal) {
-        throw new System.NotImplementedException();
+        
     }
 
     public void planFound(HashSet<KeyValuePair<string, object>> goal, Queue<GoapAction> actions) {
-        throw new System.NotImplementedException();
+        string s = "";
+        foreach (GoapAction a in actions) {
+            s += a.GetType().Name;
+            s += "-> ";
+        }
+        s += "GOAL";
+        //print(s);
+        Debug.Log("<color=green>Plan found</color> " + GoapAgent.prettyPrint(actions));
+        //GameObject textObject = new GameObject("plan");
+        //textObject.transform.SetParent(plan.transform);
+        //textObject.AddComponent<Text>().text = s;
+        //textObject.GetComponent<Text>().font = Resources.GetBuiltinResource(typeof(Font), "Arial.ttf") as Font;
     }
 
     // Update is called once per frame
@@ -54,22 +76,32 @@ public class PlayerController : MonoBehaviour, IGoap {
             StartCoroutine(GoToTrader(0));
             //StartCoroutine();
             //GoToTrader(0);
-            Trade(0);
 
         }
     }
 
-    void Start() {
-        traders = GameObject.FindGameObjectWithTag("traders").GetComponent<Trader>();
-        caravan = GameObject.FindGameObjectWithTag("Caravan").GetComponent<Caravan>();
-        inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
-    }
+
 
     public HashSet<KeyValuePair<string, object>> getWorldState() {
-        HashSet<KeyValuePair<string, object>> worldData = new HashSet<KeyValuePair<string, object>>();
+        HashSet<KeyValuePair<string, object>> worldData = new HashSet<KeyValuePair<string, object>> {
+            new KeyValuePair<string, object>("Capacity", inventory.capacity),
+            new KeyValuePair<string, object>("InTu", inventory.GetItemValue(SpiceName.Tu)),
+            new KeyValuePair<string, object>("InSa", inventory.GetItemValue(SpiceName.Sa)),
+            new KeyValuePair<string, object>("InCa", inventory.GetItemValue(SpiceName.Ca)),
+            new KeyValuePair<string, object>("InCi", inventory.GetItemValue(SpiceName.Ci)),
+            new KeyValuePair<string, object>("InCl", inventory.GetItemValue(SpiceName.Cl)),
+            new KeyValuePair<string, object>("InPe", inventory.GetItemValue(SpiceName.Pe)),
+            new KeyValuePair<string, object>("InSu", inventory.GetItemValue(SpiceName.Su)),
+            new KeyValuePair<string, object>("CaTu", inventory.GetItemValue(SpiceName.Tu)),
+            new KeyValuePair<string, object>("CaSa", inventory.GetItemValue(SpiceName.Sa)),
+            new KeyValuePair<string, object>("CaCa", inventory.GetItemValue(SpiceName.Ca)),
+            new KeyValuePair<string, object>("CaCi", inventory.GetItemValue(SpiceName.Ci)),
+            new KeyValuePair<string, object>("CaCl", inventory.GetItemValue(SpiceName.Cl)),
+            new KeyValuePair<string, object>("CaPe", inventory.GetItemValue(SpiceName.Pe)),
+            new KeyValuePair<string, object>("CaSu", inventory.GetItemValue(SpiceName.Su))
+        };
 
-        worldData.Add(new KeyValuePair<string, object>("hasTwoCapacity", inventory.capacity >= 2));
-        worldData.Add(new KeyValuePair<string, object>("", caravan.IsWin()));
+        //worldData.Add(new KeyValuePair<string, object>("isWin", caravan.IsWin()));
 
         return worldData;
     }
@@ -78,63 +110,6 @@ public class PlayerController : MonoBehaviour, IGoap {
         bool updatePath = agent.SetDestination(traders.traderPositions[traderIndex]);
         print(updatePath);
         yield return new WaitForSeconds(2.0f);
-
-    }
-
-    //public void GoToTrader(int traderIndex) {
-    //    agent.SetDestination(traders.traderPositions[traderIndex]);
-    //}
-
-    public bool Trade(int traderIndex) {
-        switch (traderIndex) {
-            case 0:            
-                inventory.GetItemFromTrader(SpiceName.Tu, 2);
-                return true;
-            case 1:
-                if(inventory.RemoveItem(SpiceName.Tu, 2)) {
-                    inventory.GetItemFromTrader(SpiceName.Sa, 1);
-                    return true;
-                }
-                return false;
-            case 2:
-                if (inventory.RemoveItem(SpiceName.Sa, 2)) {
-                    inventory.GetItemFromTrader(SpiceName.Ca, 1);
-                    return true;
-                }
-                return false;
-            case 3:
-                if (inventory.RemoveItem(SpiceName.Tu, 4)) {
-                    inventory.GetItemFromTrader(SpiceName.Ci, 1);
-                    return true;
-                }
-                return false;
-            case 4:
-                if (inventory.RemoveItem(SpiceName.Ca, 2) && inventory.RemoveItem(SpiceName.Tu, 1)) {
-                    inventory.GetItemFromTrader(SpiceName.Cl, 1);
-                    return true;
-                }
-                return false;
-            case 5:
-                if (inventory.RemoveItem(SpiceName.Tu, 2) && inventory.RemoveItem(SpiceName.Sa, 1) && inventory.RemoveItem(SpiceName.Ci, 1)) {
-                    inventory.GetItemFromTrader(SpiceName.Pe, 1);
-                    return true;
-                }
-                return false;
-            case 6:
-                if (inventory.RemoveItem(SpiceName.Ca, 4)) {
-                    inventory.GetItemFromTrader(SpiceName.Su, 1);
-                    return true;
-                }
-                return false;
-            case 7:
-                if (inventory.RemoveItem(SpiceName.Sa, 1) && inventory.RemoveItem(SpiceName.Ci, 1) && inventory.RemoveItem(SpiceName.Cl, 1)) {
-                    inventory.GetItemFromTrader(SpiceName.Su, 1);
-                    return true;
-                }
-                return false;
-            default:
-                return false;
-        }
 
     }
 }

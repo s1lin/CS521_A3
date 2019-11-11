@@ -5,34 +5,30 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-class TradeWithG : GoapAction {
+class CarToInventory : GoapAction {
 
-    private bool isTrade = false;
     private float startTime = 0;
     public float tradeDuration = 0.5f; // seconds
 
-    public Inventory inventory;
+    private Caravan caravan;
+    
     void Start() {
-        inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
-
-        addPrecondition("InCa", 4);
-
-        addEffect("InCa", -4);
-        addEffect("InSu", 1);
-        addEffect("Capacity", 3);
+        caravan = GameObject.FindGameObjectWithTag("Caravan").GetComponent<Caravan>();
+        addPrecondition("caHasOneTu", caravan.GetItemValue(SpiceName.Tu) >= 1);
+        addPrecondition("caHasOneSa", caravan.GetItemValue(SpiceName.Sa) >= 1);
+        addPrecondition("caHasOneCa", caravan.GetItemValue(SpiceName.Ca) >= 1);
+        addPrecondition("caHasOneCi", caravan.GetItemValue(SpiceName.Ci) >= 1);
+        addPrecondition("caHasOneCl", caravan.GetItemValue(SpiceName.Cl) >= 1);
+        addPrecondition("caHasOnePe", caravan.GetItemValue(SpiceName.Pe) >= 1);
+        addPrecondition("caHasOneSu", caravan.GetItemValue(SpiceName.Su) >= 1);
+        //addEffect("hasOneSu", true);
     }
-
     public override bool checkProceduralPrecondition(HashSet<KeyValuePair<string, object>> state) {
-
-        foreach (KeyValuePair<string, object> s in state) {
-            if (s.Key.Equals("InCa"))
-                return (int)s.Value == 4;
-        }
         return false;
     }
 
     public override bool isDone() {
-        return isTrade;
+        return true;
     }
 
     public override bool perform(GameObject agent) {
@@ -42,9 +38,8 @@ class TradeWithG : GoapAction {
         if (Time.time - startTime > tradeDuration) {
             // finished chopping
             Inventory inventory = agent.GetComponent<Inventory>();
-            if (inventory.RemoveItem(SpiceName.Ca, 4)) {
+            if (inventory.RemoveItem(SpiceName.Sa, 1) && inventory.RemoveItem(SpiceName.Ci, 1) && inventory.RemoveItem(SpiceName.Cl, 1)) {
                 inventory.GetItemFromTrader(SpiceName.Su, 1);
-                isTrade = true;
                 return true;
             }
             return false;
@@ -53,11 +48,10 @@ class TradeWithG : GoapAction {
     }
 
     public override bool requiresInRange() {
-        return true;// need to be near a trader
+        return true;// need to be near a 
     }
 
     public override void reset() {
-        isTrade = false;
         startTime = 0;
     }
 }
