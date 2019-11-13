@@ -5,8 +5,8 @@ using System.Collections.Generic;
 public abstract class GoapAction : MonoBehaviour {
 
 
-    private HashSet<KeyValuePair<string, object>> preconditions;
-    private HashSet<KeyValuePair<string, object>> effects;
+    private List<KeyValuePair<string, object>> preconditions;
+    private List<KeyValuePair<string, object>> effects;
 
     private bool inRange = false;
 
@@ -20,8 +20,8 @@ public abstract class GoapAction : MonoBehaviour {
     public GameObject target;
 
     public GoapAction() {
-        preconditions = new HashSet<KeyValuePair<string, object>>();
-        effects = new HashSet<KeyValuePair<string, object>>();
+        preconditions = new List<KeyValuePair<string, object>>();
+        effects = new List<KeyValuePair<string, object>>();
     }
 
     public void doReset() {
@@ -44,7 +44,7 @@ public abstract class GoapAction : MonoBehaviour {
 	 * Procedurally check if this action can run. Not all actions
 	 * will need this, but some might.
 	 */
-    public abstract bool checkProceduralPrecondition(HashSet<KeyValuePair<string, object>> state);
+    public abstract bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state);
 
     /**
 	 * Run the action.
@@ -59,7 +59,6 @@ public abstract class GoapAction : MonoBehaviour {
 	 * If not then the moveTo state will not need to run for this action.
 	 */
     public abstract bool requiresInRange();
-
 
     /**
 	 * Are we in range of the target?
@@ -106,13 +105,13 @@ public abstract class GoapAction : MonoBehaviour {
     }
 
 
-    public HashSet<KeyValuePair<string, object>> Preconditions {
+    public List<KeyValuePair<string, object>> Preconditions {
         get {
             return preconditions;
         }
     }
 
-    public HashSet<KeyValuePair<string, object>> Effects {
+    public List<KeyValuePair<string, object>> Effects {
         get {
             return effects;
         }

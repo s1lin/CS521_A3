@@ -22,13 +22,14 @@ class TradeWithB : GoapAction {
         addEffect("Capacity", 1);
     }
 
-    public override bool checkProceduralPrecondition(HashSet<KeyValuePair<string, object>> state) {
+    public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
         foreach (KeyValuePair<string, object> s in state) {
             if (s.Key.Equals("InTu"))
                 return (int)s.Value >= 2;
         }
         return false;
     }
+
 
     public override bool isDone() {
         return isTrade;

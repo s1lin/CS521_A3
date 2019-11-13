@@ -12,7 +12,7 @@ public sealed class GoapAgent : MonoBehaviour {
     private FSM.FSMState moveToState; // moves to a target
     private FSM.FSMState performActionState; // performs an action
 
-    private HashSet<GoapAction> availableActions;
+    private List<GoapAction> availableActions;
     private Queue<GoapAction> currentActions;
 
     private IGoap dataProvider; // this is the implementing class that provides our world data and listens to feedback on planning
@@ -22,7 +22,7 @@ public sealed class GoapAgent : MonoBehaviour {
 
     void Start() {
         stateMachine = new FSM();
-        availableActions = new HashSet<GoapAction>();
+        availableActions = new List<GoapAction>();
         currentActions = new Queue<GoapAction>();
         planner = new GoapPlanner();
         findDataProvider();
@@ -64,25 +64,27 @@ public sealed class GoapAgent : MonoBehaviour {
             // GOAP planning
 
             // get the world state and the goal we want to plan for
-            HashSet<KeyValuePair<string, object>> worldState = dataProvider.getWorldState();
-            HashSet<KeyValuePair<string, object>> goal = dataProvider.createGoalState();
+            List<KeyValuePair<string, object>> worldState = dataProvider.getWorldState();
+            List<KeyValuePair<string, object>> goals = dataProvider.createGoalState();
+            
+            foreach (KeyValuePair<string, object> goal in goals) {
+                // Plan
+                Queue<GoapAction> plan = planner.plan(availableActions, worldState, goal);
+                if (plan != null) {
+                    // we have a plan, hooray!
+                    currentActions = plan;
+                    dataProvider.planFound(goal, plan);
 
-            // Plan
-            Queue<GoapAction> plan = planner.plan(gameObject, availableActions, worldState, goal);
-            if (plan != null) {
-                // we have a plan, hooray!
-                currentActions = plan;
-                dataProvider.planFound(goal, plan);
+                    fsm.popState(); // move to PerformAction state
+                    fsm.pushState(performActionState);
 
-                fsm.popState(); // move to PerformAction state
-                fsm.pushState(performActionState);
-
-            } else {
-                // ugh, we couldn't get a plan
-                //Debug.Log("<color=orange>Failed Plan:</color>"+prettyPrint(goal));
-                dataProvider.planFailed(goal);
-                fsm.popState(); // move back to IdleAction state
-                fsm.pushState(idleState);
+                } else {
+                    // ugh, we couldn't get a plan
+                    //Debug.Log("<color=orange>Failed Plan:</color>"+prettyPrint(goal));
+                    dataProvider.planFailed(goal);
+                    fsm.popState(); // move back to IdleAction state
+                    fsm.pushState(idleState);
+                }
             }
 
         };
@@ -194,12 +196,22 @@ public sealed class GoapAgent : MonoBehaviour {
         Debug.Log("Found actions: " + prettyPrint(actions));
     }
 
-    public static string prettyPrint(HashSet<KeyValuePair<string, object>> state) {
+    public static string prettyPrint(List<KeyValuePair<string, object>> state) {
         String s = "";
         foreach (KeyValuePair<string, object> kvp in state) {
             s += kvp.Key + ":" + kvp.Value.ToString();
             s += ", ";
         }
+        return s;
+    }
+
+    public static string prettyPrint(GoapAction[] actions) {
+        String s = "";
+        foreach (GoapAction a in actions) {
+            s += a.GetType().Name;
+            s += "-> ";
+        }
+        s += "GOAL";
         return s;
     }
 
@@ -213,18 +225,9 @@ public sealed class GoapAgent : MonoBehaviour {
         return s;
     }
 
-    public static string prettyPrint(GoapAction[] actions) {
+    public static string prettyPrint(List<GoapAction> actions) {
         String s = "";
         foreach (GoapAction a in actions) {
-            s += a.GetType().Name;
-            s += ", ";
-        }
-        return s;
-    }
-
-    internal static string prettyPrint(HashSet<GoapAction> newActions) {
-        String s = "";
-        foreach (GoapAction a in newActions) {
             s += a.GetType().Name;
             s += ", ";
         }

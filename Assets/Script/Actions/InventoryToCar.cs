@@ -19,13 +19,16 @@ class InventoryToCar : GoapAction {
 
         addEffect("Capacity", 4);
     }
-    public override bool checkProceduralPrecondition(HashSet<KeyValuePair<string, object>> state) {
-        bool allZero = true;
-        foreach(KeyValuePair<string, object> s in state) {
-            if (s.Key.Contains("In"))
-                allZero = (int)s.Value > 0;
-        }
-        return !allZero;
+    public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
+
+        //foreach (KeyValuePair<string, object> s in state) {
+        //    if (s.Key.Equals("Capacity"))
+        //        if ((int)s.Value < 4)
+        //            return true;
+
+        //}
+
+        return false;
     }
 
     public override bool isDone() {

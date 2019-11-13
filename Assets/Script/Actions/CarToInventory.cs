@@ -14,16 +14,16 @@ class CarToInventory : GoapAction {
     
     void Start() {
         caravan = GameObject.FindGameObjectWithTag("Caravan").GetComponent<Caravan>();
-        addPrecondition("caHasOneTu", caravan.GetItemValue(SpiceName.Tu) >= 1);
-        addPrecondition("caHasOneSa", caravan.GetItemValue(SpiceName.Sa) >= 1);
-        addPrecondition("caHasOneCa", caravan.GetItemValue(SpiceName.Ca) >= 1);
-        addPrecondition("caHasOneCi", caravan.GetItemValue(SpiceName.Ci) >= 1);
-        addPrecondition("caHasOneCl", caravan.GetItemValue(SpiceName.Cl) >= 1);
-        addPrecondition("caHasOnePe", caravan.GetItemValue(SpiceName.Pe) >= 1);
-        addPrecondition("caHasOneSu", caravan.GetItemValue(SpiceName.Su) >= 1);
-        //addEffect("hasOneSu", true);
+ 
+        //addEffect("Capacity", 0);
     }
-    public override bool checkProceduralPrecondition(HashSet<KeyValuePair<string, object>> state) {
+    public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
+        //foreach (KeyValuePair<string, object> s in state) {
+        //    if (s.Key.Contains("Ca"))
+        //        if ((int)s.Value > 0)
+        //            return false;
+        //}
+
         return false;
     }
 

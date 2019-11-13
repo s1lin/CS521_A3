@@ -22,7 +22,8 @@ class TradeWithG : GoapAction {
         addEffect("Capacity", 3);
     }
 
-    public override bool checkProceduralPrecondition(HashSet<KeyValuePair<string, object>> state) {
+
+    public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
 
         foreach (KeyValuePair<string, object> s in state) {
             if (s.Key.Equals("InCa"))

@@ -31,6 +31,7 @@ public class Trader : MonoBehaviour {
         for (int i = 0; i < 8; i++) {
             GameObject trader = Instantiate(traderPrefab, traderPositions[i], transform.rotation, transform);
             trader.transform.Find("Text").GetComponent<TextMesh>().text = "Trader " + (i + 1);
+            trader.tag = "trader" + (i + 1);
             traderInstance.Add(trader);
         }
     }

@@ -14,17 +14,18 @@ class TradeWithA : GoapAction {
     public Inventory inventory;
     void Start() {
         inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
-        addPrecondition("Capacity", 2);
+        //addPrecondition("Capacity", 2);
         addEffect("InTu", 2);
         addEffect("Capacity", -2);
     }
 
-    public override bool checkProceduralPrecondition(HashSet<KeyValuePair<string, object>> state) {
-        foreach(KeyValuePair<string, object> s in state) {
-            if (s.Key.Equals("Capacity"))
-                return (int)s.Value >= 2;
-        }
-        return false;
+    public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
+        //foreach(KeyValuePair<string, object> s in state) {
+        //    if (s.Key.Equals("Capacity"))
+        //        return (int)s.Value >= 2;
+        //}
+        //return false;
+        return true;
     }
 
     public override bool isDone() {
@@ -42,7 +43,7 @@ class TradeWithA : GoapAction {
             inventory.GetItemFromTrader(SpiceName.Tu, 2);
         }
         isTrade = true;
-        //target = targetChoppingBlock.gameObject;
+        target = GameObject.FindGameObjectWithTag("trader1");
         return true;
     }
 
@@ -54,5 +55,7 @@ class TradeWithA : GoapAction {
         startTime = 0;
         isTrade = false;
     }
+
+   
 }
 

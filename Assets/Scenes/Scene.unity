@@ -33086,8 +33086,6 @@ GameObject:
   - component: {fileID: 1380932053}
   - component: {fileID: 1380932052}
   - component: {fileID: 1380932051}
-  - component: {fileID: 1380932064}
-  - component: {fileID: 1380932065}
   - component: {fileID: 1380932055}
   - component: {fileID: 1380932056}
   - component: {fileID: 1380932057}
@@ -33096,6 +33094,8 @@ GameObject:
   - component: {fileID: 1380932060}
   - component: {fileID: 1380932061}
   - component: {fileID: 1380932062}
+  - component: {fileID: 1380932065}
+  - component: {fileID: 1380932064}
   - component: {fileID: 1380932063}
   - component: {fileID: 1380932054}
   m_Layer: 8

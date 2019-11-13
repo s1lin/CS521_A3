@@ -24,10 +24,10 @@ class TradeWithC : GoapAction {
 
     }
 
-    public override bool checkProceduralPrecondition(HashSet<KeyValuePair<string, object>> state) {
+    public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
         foreach (KeyValuePair<string, object> s in state) {
             if (s.Key.Equals("InSa"))
-                return (int)s.Value >= 1;
+                return (int)s.Value >= 2;
         }
         return false;
     }

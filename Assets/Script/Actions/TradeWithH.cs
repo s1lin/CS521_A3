@@ -27,7 +27,7 @@ class TradeWithH : GoapAction {
 
     }
 
-    public override bool checkProceduralPrecondition(HashSet<KeyValuePair<string, object>> state) {
+    public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
 
         bool satisfied1 = false;
         bool satisfied2 = false;
