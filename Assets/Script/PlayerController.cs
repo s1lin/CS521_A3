@@ -10,6 +10,8 @@ public class PlayerController : MonoBehaviour, IGoap {
 
     public GameObject planTextPrefab;
     public GameObject subGoalText;
+    public GameObject globalGoalText;
+    public GameObject winText;
     public GameObject planPlane;
 
     private Inventory inventory;
@@ -55,10 +57,11 @@ public class PlayerController : MonoBehaviour, IGoap {
 
     public KeyValuePair<string, object> GetSubGoals() {
         List<KeyValuePair<string, object>> currentState = GetWorldState();
-        print("Here");
+        
         while (index != globalGoal.Count) {
             KeyValuePair<string, object> goal = globalGoal[index];
             KeyValuePair<string, object> state = currentState.Find(e => e.Key.Equals(goal.Key));
+            globalGoalText.GetComponent<Text>().text = "Get " + ((int)goal.Value - (int)state.Value) + " " + goal.Key.Substring(2) + " into Caravan.";
             if ((int)state.Value >= ((int)goal.Value)) {
                 index++;
             } else {
@@ -75,7 +78,7 @@ public class PlayerController : MonoBehaviour, IGoap {
         print("action:" + action.GetType().Name + " is finished.");
     }
     public void GameFinished() {
-        print("You WiN!");
+        winText.GetComponent<Text>().text = "true";
     }
 
     public bool MoveAgent(GoapAction nextAction) {
@@ -88,7 +91,7 @@ public class PlayerController : MonoBehaviour, IGoap {
             agent.SetDestination(pos);
         }
 
-        if (Vector3.Distance(transform.position, pos) < 3.9f) {
+        if (Vector3.Distance(transform.position, pos) < 5f) {
             nextAction.setInRange(true);
             return true;
         }
