@@ -6,15 +6,18 @@ using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour, IGoap {
 
-    public Camera cam;
-
     public NavMeshAgent agent;
+
+    public GameObject planTextPrefab;
+    public GameObject subGoalText;
+    public GameObject planPlane;
 
     private Inventory inventory;
     private Caravan caravan;
     private Trader traders;
-    private GameObject plan;
+
     private int index = 0;
+
 
     private List<KeyValuePair<string, object>> worldData;
 
@@ -26,10 +29,10 @@ public class PlayerController : MonoBehaviour, IGoap {
             //
             new KeyValuePair<string, object>("CaTu", 2),
             new KeyValuePair<string, object>("CaSa", 2),
-            //new KeyValuePair<string, object>("CaCa", 2),
-            //new KeyValuePair<string, object>("CaCi", 2),
-            //new KeyValuePair<string, object>("CaCl", 2),
-            //new KeyValuePair<string, object>("CaPe", 2)
+            new KeyValuePair<string, object>("CaCa", 2),
+            new KeyValuePair<string, object>("CaCi", 2),
+            new KeyValuePair<string, object>("CaCl", 2),
+            new KeyValuePair<string, object>("CaPe", 2)
             //new KeyValuePair<string, object>("CaSu", 2)
         };
 
@@ -48,7 +51,6 @@ public class PlayerController : MonoBehaviour, IGoap {
         traders = GameObject.FindGameObjectWithTag("traders").GetComponent<Trader>();
         caravan = GameObject.FindGameObjectWithTag("Caravan").GetComponent<Caravan>();
         inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
-        plan = GameObject.FindGameObjectWithTag("Plans");
     }
 
     public KeyValuePair<string, object> GetSubGoals() {
@@ -60,10 +62,12 @@ public class PlayerController : MonoBehaviour, IGoap {
             if ((int)state.Value >= ((int)goal.Value)) {
                 index++;
             } else {
-                return subGoal.Find(e => e.Key.Contains(goal.Key.Substring(2)));
+                KeyValuePair<string, object> sg = subGoal.Find(e => e.Key.Contains(goal.Key.Substring(2)));
+                subGoalText.GetComponent<Text>().text = "Get " + sg.Value + " " + sg.Key.Substring(2) + " into Inventory.";
+                return sg;
             }
         }
-                
+
         return new KeyValuePair<string, object>();
     }
 
@@ -101,18 +105,18 @@ public class PlayerController : MonoBehaviour, IGoap {
     }
 
     public void PlanFound(KeyValuePair<string, object> goal, Queue<GoapAction> actions) {
-        string s = "";
-        foreach (GoapAction a in actions) {
-            s += a.GetType().Name;
-            s += "-> ";
-        }
-        s += "GOAL";
-        //print(s);
+
         Debug.Log("<color=green>Plan found</color> " + GoapAgent.prettyPrint(actions));
-        //GameObject textObject = new GameObject("plan");
-        //textObject.transform.SetParent(plan.transform);
-        //textObject.AddComponent<Text>().text = s;
-        //textObject.GetComponent<Text>().font = Resources.GetBuiltinResource(typeof(Font), "Arial.ttf") as Font;
+        GameObject[] texts = GameObject.FindGameObjectsWithTag("plan_text");
+        for (int i = 0; i < texts.Length; i++) {
+            GameObject.Destroy(texts[i]);
+        }
+
+        foreach (GoapAction a in actions) {
+            GameObject textObject = Instantiate(planTextPrefab, planPlane.transform) as GameObject;
+            textObject.GetComponent<Text>().text = GoapAgent.prettyPrint(a);
+        }
+
     }
 
     public List<KeyValuePair<string, object>> GetWorldState() {
