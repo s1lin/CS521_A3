@@ -8,6 +8,8 @@ public abstract class GoapAction : MonoBehaviour {
     private List<KeyValuePair<string, object>> preconditions;
     private List<KeyValuePair<string, object>> effects;
 
+    public List<KeyValuePair<SpiceName, int>> takeout;
+
     private bool inRange = false;
 
     public float actionDuration = 20f;//about 1s
@@ -18,11 +20,13 @@ public abstract class GoapAction : MonoBehaviour {
     public GoapAction() {
         preconditions = new List<KeyValuePair<string, object>>();
         effects = new List<KeyValuePair<string, object>>();
+        takeout = new List<KeyValuePair<SpiceName, int>>();
     }
 
     public void doReset() {
         inRange = false;
         inWait = false;
+       
         reset();
     }
 

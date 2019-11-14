@@ -671,7 +671,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.1
+  m_VoxelSize: 0.33333334
   m_BuildHeightMesh: 0
   m_NavMeshData: {fileID: 23800000, guid: bb3e849f3f97641438f089b4f3f5d6f0, type: 2}
 --- !u!4 &135105666
@@ -1658,7 +1658,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.0000019073, y: 234.92}
+  m_AnchoredPosition: {x: 0.010005, y: 279.73}
   m_SizeDelta: {x: 240.72, y: 28.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &605307597
@@ -2692,8 +2692,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 120.36, y: -268.02}
-  m_SizeDelta: {x: 240.72, y: 498.03}
+  m_AnchoredPosition: {x: 120.36, y: -313.63}
+  m_SizeDelta: {x: 240.7, y: 589.24}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1237027999
 MonoBehaviour:
@@ -2946,8 +2946,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 120, y: -316.8}
-  m_SizeDelta: {x: 225, y: 321.4}
+  m_AnchoredPosition: {x: 120, y: -367.5}
+  m_SizeDelta: {x: 225, y: 422.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1271598242
 MonoBehaviour:
@@ -37926,8 +37926,8 @@ MonoBehaviour:
   traderPrefab: {fileID: 8731886742221569616, guid: e40c281af5a3f5949aeb1a05c99d4027,
     type: 3}
   traderPositions:
-  - {x: 8, y: -17, z: -1}
-  - {x: -7.5, y: -17, z: -1}
+  - {x: 8, y: -16.5, z: -1}
+  - {x: -7.5, y: -16.5, z: -1}
   - {x: -18.5, y: 6.4, z: -1}
   - {x: -18.5, y: -5.5, z: -1}
   - {x: -7.5, y: 18, z: -1}
@@ -38072,7 +38072,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.1
+  m_VoxelSize: 0.33333334
   m_BuildHeightMesh: 0
   m_NavMeshData: {fileID: 23800000, guid: 4189fbd543369ce4684b23f716407ed9, type: 2}
 --- !u!1 &1932999566

@@ -8,8 +8,8 @@ public class Trader : MonoBehaviour {
     private List<GameObject> traderInstance;
 
     public Vector3[] traderPositions = {
-        new Vector3(8f, -17f, 0f),
-        new Vector3(-7.5f, -17f, 0f),
+        new Vector3(8f, -16.5f, 0f),
+        new Vector3(-7.5f, -16.5f, 0f),
         new Vector3(-18f, 6.4f, 0f),
         new Vector3(-18f, -5.5f, 0f),
         new Vector3(-7.5f, 18f, 0f),

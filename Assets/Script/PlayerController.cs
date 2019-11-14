@@ -28,14 +28,13 @@ public class PlayerController : MonoBehaviour, IGoap {
 
     public PlayerController() {
         globalGoal = new List<KeyValuePair<string, object>> {
-            //
             new KeyValuePair<string, object>("CaTu", 2),
             new KeyValuePair<string, object>("CaSa", 2),
             new KeyValuePair<string, object>("CaCa", 2),
             new KeyValuePair<string, object>("CaCi", 2),
             new KeyValuePair<string, object>("CaCl", 2),
-            new KeyValuePair<string, object>("CaPe", 2)
-            //new KeyValuePair<string, object>("CaSu", 2)
+            new KeyValuePair<string, object>("CaPe", 2),
+            new KeyValuePair<string, object>("CaSu", 2)
         };
 
         subGoal = new List<KeyValuePair<string, object>> {
@@ -44,8 +43,8 @@ public class PlayerController : MonoBehaviour, IGoap {
             new KeyValuePair<string, object>("InCa", 1), //Capacity < 4        
             new KeyValuePair<string, object>("InCi", 1), //Capacity < 4        
             new KeyValuePair<string, object>("InCl", 1), //Capacity < 4        
-            new KeyValuePair<string, object>("InPe", 1) //Capacity < 4      
-            //new KeyValuePair<string, object>("InSu", 1)
+            new KeyValuePair<string, object>("InPe", 1), //Capacity < 4      
+            new KeyValuePair<string, object>("InSu", 1)
         };
     }
 

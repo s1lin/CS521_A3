@@ -25,8 +25,8 @@ class CarToInventory : GoapAction {
         Inventory inventory = agent.GetComponent<Inventory>();
         bool succ = false;
 
-        if (inventory.RemoveItem(SpiceName.Sa, 1) && inventory.RemoveItem(SpiceName.Ci, 1) && inventory.RemoveItem(SpiceName.Cl, 1)) {
-            inventory.GetItemFromTrader(SpiceName.Su, 1);
+        foreach(KeyValuePair<SpiceName, int> value in takeout) {
+            inventory.GetItemFromCaravan(value.Key, value.Value);
             succ = true;
         }
 
@@ -45,6 +45,7 @@ class CarToInventory : GoapAction {
     public override void reset() {
         isFinished = false;
         isSucc = false;
+        takeout = new List<KeyValuePair<SpiceName, int>>();
     }
 }
 
