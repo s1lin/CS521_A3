@@ -17,7 +17,7 @@ public abstract class GoapAction : MonoBehaviour {
 
     /**
 	 * An action often has to perform on an object. This is that object. Can be null. */
-    public GameObject target;
+    public int target = -1;
 
     public GoapAction() {
         preconditions = new List<KeyValuePair<string, object>>();
@@ -26,7 +26,6 @@ public abstract class GoapAction : MonoBehaviour {
 
     public void doReset() {
         inRange = false;
-        target = null;
         reset();
     }
 

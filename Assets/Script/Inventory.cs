@@ -21,7 +21,7 @@ public class Inventory : MonoBehaviour {
             { SpiceName.Su, 0 }
         };
     }
-    void Start() {      
+    void Start() {
         caravan = GameObject.FindGameObjectWithTag("Caravan").GetComponent<Caravan>();
     }
 
@@ -35,7 +35,7 @@ public class Inventory : MonoBehaviour {
         }
     }
 
-    public void GetItemFromTrader(SpiceName name, int value) {    
+    public void GetItemFromTrader(SpiceName name, int value) {
         if (capacity >= value) {
             for (int i = 0; i < value; i++)
                 PutItem(name);
@@ -44,10 +44,10 @@ public class Inventory : MonoBehaviour {
 
     public void PutItem(SpiceName name) {
         int value = 0;
-        if (capacity > 0) {
-            
+        if (capacity >= 0) {
+
             if (items.TryGetValue(name, out value)) {
-                items.Remove(name);                
+                items.Remove(name);
                 items.Add(name, value + 1);
             } else
                 items.Add(name, 1);
@@ -61,26 +61,26 @@ public class Inventory : MonoBehaviour {
 
     public bool RemoveItem(SpiceName name, int quanlity) {
         int value = 0;
-        if (capacity < 4 && capacity >= 0) {
+        if (capacity >= 0) {
             if (items.TryGetValue(name, out value)) {
-                if (value != 0 && value > quanlity) {
+                if (value != 0 && value >= quanlity) {
                     value -= quanlity;
                     items.Remove(name);
                     items.Add(name, value);
 
-                    capacity++;
+                    capacity += quanlity;
                     inventoryText = GameObject.FindGameObjectWithTag(SpiceNames.ToString(name)).GetComponent<Text>();
                     inventoryText.text = string.Format("{0}", value);
                     return true;
                 }
-            }                   
+            }
         }
         return false;
     }
 
     public int GetItemValue(SpiceName name) {
-        items.TryGetValue(name, out int value);           
+        items.TryGetValue(name, out int value);
         return value;
     }
-    
+
 }

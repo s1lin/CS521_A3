@@ -13,6 +13,7 @@ class TradeWithD : GoapAction {
 
     public Inventory inventory;
     void Start() {
+        target = 3;
         inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
 
         addPrecondition("InTu", 4);
@@ -36,18 +37,12 @@ class TradeWithD : GoapAction {
     }
 
     public override bool perform(GameObject agent) {
-        if (startTime == 0)
-            startTime = Time.time;
 
-        if (Time.time - startTime > tradeDuration) {
-            // finished chopping
-            Inventory inventory = agent.GetComponent<Inventory>();
-            if (inventory.RemoveItem(SpiceName.Tu, 4)) {
-                inventory.GetItemFromTrader(SpiceName.Ci, 1);
-                isTrade = true;
-                return true;
-            }
-            return false;
+        Inventory inventory = agent.GetComponent<Inventory>();
+        if (inventory.RemoveItem(SpiceName.Tu, 4)) {
+            inventory.GetItemFromTrader(SpiceName.Ci, 1);
+            isTrade = true;
+            return true;
         }
         return false;
     }

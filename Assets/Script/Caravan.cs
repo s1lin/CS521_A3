@@ -26,18 +26,6 @@ public class Caravan : MonoBehaviour {
         inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
     }
 
-    // Update is called once per frame
-    void Update() {
-        if (Input.GetKeyDown(KeyCode.O)) {
-            GetItemFromInventory(SpiceName.Ca, 2);
-            GetItemFromInventory(SpiceName.Tu, 2);
-        }
-
-        if (IsWin()) {
-            print("Player Win");
-        }
-    }
-
     public bool IsWin() {
         if (items.Keys.Count == 8) {
             foreach (KeyValuePair<SpiceName, int> entry in items) {

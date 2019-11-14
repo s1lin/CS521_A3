@@ -14,12 +14,13 @@ class TradeWithC : GoapAction {
 
     public Inventory inventory;
     void Start() {
+        target = 2;
         inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
 
         addPrecondition("InSa", 2);
 
         addEffect("InSa", -2);
-        addEffect("InCa", 1);        
+        addEffect("InCa", 1);
         addEffect("Capacity", 1);
 
     }
@@ -37,18 +38,11 @@ class TradeWithC : GoapAction {
     }
 
     public override bool perform(GameObject agent) {
-        if (startTime == 0)
-            startTime = Time.time;
-
-        if (Time.time - startTime > tradeDuration) {
-            // finished chopping
-            Inventory inventory = agent.GetComponent<Inventory>();
-            if (inventory.RemoveItem(SpiceName.Sa, 2)) {
-                inventory.GetItemFromTrader(SpiceName.Ca, 1);
-                isTrade = true;
-                return true;
-            }
-            return false;
+        Inventory inventory = agent.GetComponent<Inventory>();
+        if (inventory.RemoveItem(SpiceName.Sa, 2)) {
+            inventory.GetItemFromTrader(SpiceName.Ca, 1);
+            isTrade = true;
+            return true;
         }
         return false;
     }

@@ -10,8 +10,8 @@ public class Trader : MonoBehaviour {
     public Vector3[] traderPositions = {
         new Vector3(8f, -17f, 0f),
         new Vector3(-7.5f, -17f, 0f),
-        new Vector3(-20f, 6.4f, 0f),
-        new Vector3(-20f, -5.5f, 0f),
+        new Vector3(-18f, 6.4f, 0f),
+        new Vector3(-18f, -5.5f, 0f),
         new Vector3(-7.5f, 18f, 0f),
         new Vector3(8f, 18f, 0f),
         new Vector3(20f, 7.3f, 0f),
@@ -31,7 +31,7 @@ public class Trader : MonoBehaviour {
         for (int i = 0; i < 8; i++) {
             GameObject trader = Instantiate(traderPrefab, traderPositions[i], transform.rotation, transform);
             trader.transform.Find("Text").GetComponent<TextMesh>().text = "Trader " + (i + 1);
-            trader.tag = "trader" + (i + 1);
+            trader.gameObject.tag = "trader" + (i + 1);
             traderInstance.Add(trader);
         }
     }

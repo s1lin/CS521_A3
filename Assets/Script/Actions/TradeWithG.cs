@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 class TradeWithG : GoapAction {
@@ -12,7 +8,9 @@ class TradeWithG : GoapAction {
     public float tradeDuration = 0.5f; // seconds
 
     public Inventory inventory;
+
     void Start() {
+        target = 6;
         inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
 
         addPrecondition("InCa", 4);
@@ -21,7 +19,6 @@ class TradeWithG : GoapAction {
         addEffect("InSu", 1);
         addEffect("Capacity", 3);
     }
-
 
     public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
 
@@ -37,18 +34,12 @@ class TradeWithG : GoapAction {
     }
 
     public override bool perform(GameObject agent) {
-        if (startTime == 0)
-            startTime = Time.time;
 
-        if (Time.time - startTime > tradeDuration) {
-            // finished chopping
-            Inventory inventory = agent.GetComponent<Inventory>();
-            if (inventory.RemoveItem(SpiceName.Ca, 4)) {
-                inventory.GetItemFromTrader(SpiceName.Su, 1);
-                isTrade = true;
-                return true;
-            }
-            return false;
+        Inventory inventory = agent.GetComponent<Inventory>();
+        if (inventory.RemoveItem(SpiceName.Ca, 4)) {
+            inventory.GetItemFromTrader(SpiceName.Su, 1);
+            isTrade = true;
+            return true;
         }
         return false;
     }
