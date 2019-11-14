@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 class TradeWithE : GoapAction {
 
-    private bool isTrade = false;
-    private float startTime = 0;
-    public float tradeDuration = 0.5f; // seconds
-    public Inventory inventory;
+    private bool isSucc = false;
+    private bool isFinished = false;
+
     void Start() {
         target = 4;
-        inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
 
         addPrecondition("InCa", 1);
         addPrecondition("InTu", 1);
@@ -18,7 +17,6 @@ class TradeWithE : GoapAction {
         addEffect("InTu", -1);
         addEffect("InCl", +1);
         addEffect("Capacity", 1);
-
     }
 
     public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
@@ -38,18 +36,30 @@ class TradeWithE : GoapAction {
     }
 
     public override bool isDone() {
-        return isTrade;
+        return isFinished;
     }
 
     public override bool perform(GameObject agent) {
+        StartCoroutine(performAction(agent));
+        return isSucc;
+    }
+
+    public IEnumerator performAction(GameObject agent) {
 
         Inventory inventory = agent.GetComponent<Inventory>();
+        bool succ = false;
+
         if (inventory.RemoveItem(SpiceName.Ca, 2) && inventory.RemoveItem(SpiceName.Tu, 1)) {
             inventory.GetItemFromTrader(SpiceName.Cl, 1);
-            isTrade = true;
-            return true;
+            succ = true;
         }
-        return false;
+
+        inWait = true;
+        yield return new WaitForSecondsRealtime(actionDuration);
+        inWait = false;
+
+        isFinished = true;
+        isSucc = succ;
 
     }
 
@@ -58,7 +68,7 @@ class TradeWithE : GoapAction {
     }
 
     public override void reset() {
-        startTime = 0;
-        isTrade = false;
+        isFinished = false;
+        isSucc = false;
     }
 }

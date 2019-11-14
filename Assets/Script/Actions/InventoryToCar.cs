@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,9 +8,9 @@ using UnityEngine;
 
 class InventoryToCar : GoapAction {
 
-    private float startTime = 0;
-    private bool isStored = false;   
-    public float tradeDuration = 0.5f; // seconds
+    private bool isSucc = false;
+    private bool isFinished = false;
+
 
     void Start() {
 
@@ -20,10 +21,15 @@ class InventoryToCar : GoapAction {
     }
 
     public override bool isDone() {
-        return isStored;
+        return isFinished;
     }
 
     public override bool perform(GameObject agent) {
+        StartCoroutine(performAction(agent));
+        return isSucc;
+    }
+
+    public IEnumerator performAction(GameObject agent) {
 
         Inventory inventory = agent.GetComponent<Inventory>();
         Caravan caravan = GameObject.FindGameObjectWithTag("Caravan").GetComponent<Caravan>();
@@ -44,8 +50,12 @@ class InventoryToCar : GoapAction {
         caravan.GetItemFromInventory(SpiceName.Pe, value6);
         caravan.GetItemFromInventory(SpiceName.Su, value7);
 
-        isStored = true;
-        return true;
+        inWait = true;
+        yield return new WaitForSecondsRealtime(actionDuration);
+        inWait = false;
+
+        isFinished = true;
+        isSucc = true;
     }
 
     public override bool requiresInRange() {
@@ -53,8 +63,8 @@ class InventoryToCar : GoapAction {
     }
 
     public override void reset() {
-        startTime = 0;
-        isStored = false;
+        isFinished = false;
+        isSucc = false;
     }
 }
 

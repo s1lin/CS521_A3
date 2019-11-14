@@ -70,7 +70,7 @@ public sealed class GoapAgent : MonoBehaviour {
             if (!goal.Equals(new KeyValuePair<string, object>())) {
                 // Plan
                 Queue<GoapAction> plan = planner.plan(availableActions, worldState, goal);
-                
+
                 if (plan != null) {
                     // we have a plan, hooray!
                     currentActions = plan;
@@ -80,7 +80,7 @@ public sealed class GoapAgent : MonoBehaviour {
                     fsm.pushState(performActionState);
 
                 } else {
-              
+
                     dataProvider.PlanFailed(goal);
                     fsm.popState(); // move back to IdleAction state
                     fsm.pushState(idleState);
@@ -118,34 +118,42 @@ public sealed class GoapAgent : MonoBehaviour {
             }
 
             GoapAction action = currentActions.Peek();
-            
+
+
+
             if (action.isDone()) {
                 // the action is done. Remove it so we can perform the next one
                 action.doReset();
-                currentActions.Dequeue();                
+                currentActions.Dequeue();
             }
 
             if (hasActionPlan()) {
                 // perform the next action
                 action = currentActions.Peek();
                 bool inRange = action.isInRange();
-                
-                if (inRange) {
-                    // we are in range, so perform the action
-                    bool success = action.perform(gameObj);
-                    print(action + success.ToString());
-                    if (!success) {
-                        // action failed, we need to plan again
-                        fsm.popState();
-                        fsm.pushState(idleState);
-                        dataProvider.PlanAborted(action);
+
+                if (!action.inWait) {
+                    if (inRange) {
+                        //if (!action.inWait) {
+                        // we are in range, so perform the action
+                        bool success = action.perform(gameObj);
+                        if (!action.inWait) {
+                            print(action + success.ToString());
+                            if (!success) {
+                                // action failed, we need to plan again
+                                fsm.popState();
+                                fsm.pushState(idleState);
+                                dataProvider.PlanAborted(action);
+                            }
+                        }
+
+                    } else {
+                        // we need to move there first
+                        // push moveTo state                   
+                        fsm.pushState(moveToState);
                     }
-                    
-                } else {
-                    // we need to move there first
-                    // push moveTo state                   
-                    fsm.pushState(moveToState);
                 }
+
 
             } else {
                 Debug.Log(prettyPrint(action));
@@ -153,6 +161,7 @@ public sealed class GoapAgent : MonoBehaviour {
                 fsm.popState();
                 fsm.pushState(idleState);
             }
+
 
         };
     }

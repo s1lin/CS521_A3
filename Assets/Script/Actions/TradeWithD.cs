@@ -1,20 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 class TradeWithD : GoapAction {
 
-    private bool isTrade = false;
-    private float startTime = 0;
-    public float tradeDuration = 0.5f; // seconds
+    private bool isSucc = false;
+    private bool isFinished = false;
 
-    public Inventory inventory;
     void Start() {
         target = 3;
-        inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
 
         addPrecondition("InTu", 4);
 
@@ -33,18 +28,29 @@ class TradeWithD : GoapAction {
     }
 
     public override bool isDone() {
-        return isTrade;
+        return isFinished;
     }
 
     public override bool perform(GameObject agent) {
+        StartCoroutine(performAction(agent));
+        return isSucc;
+    }
+
+    public IEnumerator performAction(GameObject agent) {
 
         Inventory inventory = agent.GetComponent<Inventory>();
+        bool succ = false;
+
         if (inventory.RemoveItem(SpiceName.Tu, 4)) {
             inventory.GetItemFromTrader(SpiceName.Ci, 1);
-            isTrade = true;
-            return true;
+            succ = true;
         }
-        return false;
+        inWait = true;
+        yield return new WaitForSecondsRealtime(actionDuration);
+        inWait = false;
+
+        isFinished = true;
+        isSucc = succ;
     }
 
     public override bool requiresInRange() {
@@ -52,8 +58,8 @@ class TradeWithD : GoapAction {
     }
 
     public override void reset() {
-        startTime = 0;
-        isTrade = false;
+        isFinished = false;
+        isSucc = false;
     }
 }
 

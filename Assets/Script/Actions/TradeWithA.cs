@@ -1,43 +1,53 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 class TradeWithA : GoapAction {
 
-    private bool isTrade = false;
-    private float startTime = 0;
-    public float tradeDuration = 0.5f; // seconds
+    private bool isSucc = false;
 
-    public Inventory inventory;
+    private bool isFinished = false;
+
     void Start() {
-
         target = 0;
-        inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
 
-        //addPrecondition("Capacity", 2);
+        addPrecondition("Capacity", 2);
+
         addEffect("InTu", 2);
         addEffect("Capacity", -2);
     }
 
     public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
-        //foreach(KeyValuePair<string, object> s in state) {
-        //    if (s.Key.Equals("Capacity"))
-        //        return (int)s.Value >= 2;
-        //}
-        //return false;
-        return true;
+        foreach (KeyValuePair<string, object> s in state) {
+            if (s.Key.Equals("Capacity"))
+                return (int)s.Value >= 2;
+        }
+        return false;
     }
 
     public override bool isDone() {
-        return isTrade;
+        return isFinished;
     }
 
     public override bool perform(GameObject agent) {
+        
+        StartCoroutine(performAction(agent));
+       
+        return isSucc;
+    }
+
+    public IEnumerator performAction(GameObject agent) {
 
         Inventory inventory = agent.GetComponent<Inventory>();
         inventory.GetItemFromTrader(SpiceName.Tu, 2);
-        isTrade = true;        
+        
+        inWait = true;
+        yield return new WaitForSecondsRealtime(actionDuration);
+        inWait = false;
+        
+        isFinished = true;
+        isSucc = true;
 
-        return true;
     }
 
     public override bool requiresInRange() {
@@ -45,10 +55,9 @@ class TradeWithA : GoapAction {
     }
 
     public override void reset() {
-        startTime = 0;
-        isTrade = false;
+        isFinished = false;
+        isSucc = false;
     }
-
    
 }
 
