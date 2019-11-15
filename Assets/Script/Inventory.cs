@@ -31,7 +31,7 @@ public class Inventory : MonoBehaviour {
             for (int i = 0; i < value; i++)
                 PutItem(name);
             for (int i = 0; i < value; i++)
-                caravan.RemoveItem(name);
+                caravan.RemoveItemByOne(name);
         }
     }
 
@@ -59,7 +59,7 @@ public class Inventory : MonoBehaviour {
         }
     }
 
-    public bool RemoveItem(SpiceName name, int quanlity) {
+    public bool RemoveItemByQuanlity(SpiceName name, int quanlity) {
         int value = 0;
         if (capacity >= 0) {
             if (items.TryGetValue(name, out value)) {

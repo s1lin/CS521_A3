@@ -15,9 +15,12 @@ class CarToInventory : GoapAction {
         return isFinished;
     }
 
-    public override bool perform(GameObject agent) {
-        StartCoroutine(performAction(agent));
+    public override bool IsSucc() {
         return isSucc;
+    }
+
+    public override void perform(GameObject agent) {
+        StartCoroutine(performAction(agent));
     }
 
     public IEnumerator performAction(GameObject agent) {

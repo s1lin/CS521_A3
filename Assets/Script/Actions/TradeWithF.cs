@@ -48,9 +48,12 @@ class TradeWithF : GoapAction {
         return isFinished;
     }
 
-    public override bool perform(GameObject agent) {
-        StartCoroutine(performAction(agent));
+    public override bool IsSucc() {
         return isSucc;
+    }
+
+    public override void perform(GameObject agent) {
+        StartCoroutine(performAction(agent));
     }
 
     public IEnumerator performAction(GameObject agent) {
@@ -58,7 +61,7 @@ class TradeWithF : GoapAction {
         Inventory inventory = agent.GetComponent<Inventory>();
         bool succ = false;
 
-        if (inventory.RemoveItem(SpiceName.Tu, 2) && inventory.RemoveItem(SpiceName.Sa, 1) && inventory.RemoveItem(SpiceName.Ci, 1)) {
+        if (inventory.RemoveItemByQuanlity(SpiceName.Tu, 2) && inventory.RemoveItemByQuanlity(SpiceName.Sa, 1) && inventory.RemoveItemByQuanlity(SpiceName.Ci, 1)) {
             inventory.GetItemFromTrader(SpiceName.Pe, 1);
             succ = true;
         }

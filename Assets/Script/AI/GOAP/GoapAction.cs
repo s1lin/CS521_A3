@@ -12,10 +12,12 @@ public abstract class GoapAction : MonoBehaviour {
 
     private bool inRange = false;
 
-    public float actionDuration = 20f;//about 1s
+    public float actionDuration = 10f;//about 1s
     public float cost = 1f;
     public int target = -1;
+
     public bool inWait = false;
+    public bool init = true;
 
     public GoapAction() {
         preconditions = new List<KeyValuePair<string, object>>();
@@ -26,7 +28,7 @@ public abstract class GoapAction : MonoBehaviour {
     public void doReset() {
         inRange = false;
         inWait = false;
-       
+        init = true;
         reset();
     }
 
@@ -82,9 +84,11 @@ public abstract class GoapAction : MonoBehaviour {
 
     public abstract bool isDone();
 
+    public abstract bool IsSucc();
+
     public abstract bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state);
 
-    public abstract bool perform(GameObject agent);
+    public abstract void perform(GameObject agent);
 
     public abstract bool requiresInRange();
 

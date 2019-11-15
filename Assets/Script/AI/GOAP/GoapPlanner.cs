@@ -41,7 +41,7 @@ public class GoapPlanner {
             a.doReset();
         }
 
-        //Debug.Log("Start World:" + GoapAgent.prettyPrint(worldState));
+        Debug.Log("Start World:" + GoapAgent.prettyPrint(worldState));
 
         List<GoapAction> usableActions = findActions(worldState, new List<GoapAction>());
 

@@ -65,7 +65,9 @@ public sealed class GoapAgent : MonoBehaviour {
             List<KeyValuePair<string, object>> worldState = dataProvider.GetWorldState();
 
             KeyValuePair<string, object> goal = dataProvider.GetSubGoals();
-            
+
+            //Debug.Log(prettyPrint(worldState));
+
             if (!goal.Equals(new KeyValuePair<string, object>())) {
                 // Plan
                 Queue<GoapAction> plan = planner.plan(availableActions, worldState, goal);
@@ -118,43 +120,40 @@ public sealed class GoapAgent : MonoBehaviour {
 
             GoapAction action = currentActions.Peek();
 
-            if (action.isDone()) {
-                // the action is done. Remove it so we can perform the next one
-                action.doReset();
-                currentActions.Dequeue();
+            if (!action.init) {
+                if (!action.inWait) {
+                    bool success = action.IsSucc();
+                    Debug.Log(action + success.ToString());
+                    if (!success) {
+                        // action failed, we need to plan again
+                        fsm.popState();
+                        fsm.pushState(idleState);
+                        dataProvider.PlanAborted(action);
+                        action.doReset();
+                        return;
+                    }
+
+                    if (action.isDone()) {
+                        // the action is done. Remove it so we can perform the next one
+                        action.doReset();
+                        currentActions.Dequeue();
+                    }
+                } else {
+                    return;
+                }                                            
             }
 
             if (hasActionPlan()) {
-                // perform the next action
+                // perform the next action             
                 action = currentActions.Peek();
-                bool inRange = action.isInRange();
 
-                if (!action.inWait) {
-                    if (inRange) {
-                        //if (!action.inWait) {
-                        // we are in range, so perform the action
-                        bool success = action.perform(gameObj);
-                        if (!action.inWait) {
-                            print(action + success.ToString());
-                            if (!success) {
-                                // action failed, we need to plan again
-                                fsm.popState();
-                                fsm.pushState(idleState);
-                                dataProvider.PlanAborted(action);
-                            }
-                        }
-
-                    } else {
-                        // we need to move there first
-                        // push moveTo state                   
-                        fsm.pushState(moveToState);
-                    }
-                }
-
+                if (action.isInRange()) {
+                    action.perform(gameObj);
+                    action.init = false;
+                } else
+                    fsm.pushState(moveToState);           
 
             } else {
-                //Debug.Log(prettyPrint(action));
-                // no actions left, move to Plan state
                 fsm.popState();
                 fsm.pushState(idleState);
             }

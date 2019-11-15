@@ -42,7 +42,7 @@ public class Caravan : MonoBehaviour {
         if (curValue >= value) {
             for (int i = 0; i < value; i++)
                 PutItem(name);
-            inventory.RemoveItem(name, value);
+            inventory.RemoveItemByQuanlity(name, value);
         }
     }
 
@@ -57,7 +57,7 @@ public class Caravan : MonoBehaviour {
         caravanText = GameObject.FindGameObjectWithTag(SpiceNames.ToString(name) + "_c").GetComponent<Text>();
         caravanText.text = "" + value;
     }
-    public void RemoveItem(SpiceName name) {
+    public void RemoveItemByOne(SpiceName name) {
         int value = 0;
 
         if (items.TryGetValue(name, out value)) {

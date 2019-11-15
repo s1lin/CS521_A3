@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour, IGoap {
     public GameObject planTextPrefab;
     public GameObject subGoalText;
     public GameObject globalGoalText;
+    public GameObject actionText;
     public GameObject winText;
     public GameObject planPlane;
 
@@ -20,6 +21,7 @@ public class PlayerController : MonoBehaviour, IGoap {
     private Trader traders;
 
     private int index = 0;
+    private int planIndex = 1;
 
     private List<KeyValuePair<string, object>> worldData;
 
@@ -57,7 +59,7 @@ public class PlayerController : MonoBehaviour, IGoap {
 
     public KeyValuePair<string, object> GetSubGoals() {
         List<KeyValuePair<string, object>> currentState = GetWorldState();
-        
+        index = 0;
         while (index != globalGoal.Count) {
             KeyValuePair<string, object> goal = globalGoal[index];
             KeyValuePair<string, object> state = currentState.Find(e => e.Key.Equals(goal.Key));
@@ -82,6 +84,7 @@ public class PlayerController : MonoBehaviour, IGoap {
     }
 
     public bool MoveAgent(GoapAction nextAction) {
+        //actionText.GetComponent<Text>().text = GoapAgent.prettyPrint(nextAction) + "Action Running";
         Vector3 pos;
         if (nextAction.GetType().Name.Equals("InventoryToCar") || nextAction.GetType().Name.Equals("CarToInventory")) {
             pos = caravan.transform.position;
@@ -95,12 +98,12 @@ public class PlayerController : MonoBehaviour, IGoap {
             nextAction.setInRange(true);
             return true;
         }
-
+        
         return false;
     }
 
     public void PlanAborted(GoapAction aborter) {
-        Debug.Log("<color=red>Plan Aborted</color> " + GoapAgent.prettyPrint(aborter));
+        actionText.GetComponent<Text>().text = "Plan " + planIndex + " action " + GoapAgent.prettyPrint(aborter) + " Aborted.";
     }
 
     public void PlanFailed(KeyValuePair<string, object> failedGoal) {
@@ -114,10 +117,13 @@ public class PlayerController : MonoBehaviour, IGoap {
             GameObject.Destroy(texts[i]);
         }
 
+        GameObject textObject = Instantiate(planTextPrefab, planPlane.transform) as GameObject;
+        textObject.GetComponent<Text>().text = "The Number " + planIndex.ToString() + " Plan.";
         foreach (GoapAction a in actions) {
-            GameObject textObject = Instantiate(planTextPrefab, planPlane.transform) as GameObject;
+            textObject = Instantiate(planTextPrefab, planPlane.transform) as GameObject;
             textObject.GetComponent<Text>().text = GoapAgent.prettyPrint(a);
         }
+        planIndex++;
 
     }
 
