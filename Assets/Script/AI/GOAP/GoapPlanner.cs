@@ -7,51 +7,43 @@ public class GoapPlanner {
     private HashSet<GoapAction> usedActionList;
 
     public GoapPlanner() {
-        this.actionList = new List<GoapAction>();
-        this.usedActionList = new HashSet<GoapAction>();
+        actionList = new List<GoapAction>();
+        usedActionList = new HashSet<GoapAction>();
     }
 
-    public Queue<GoapAction> plan(List<GoapAction> actions, List<KeyValuePair<string, object>> worldState,
-                                  KeyValuePair<string, object> goal) {
+    public Queue<GoapAction> plan(List<GoapAction> actions, List<KeyValuePair<string, object>> worldState, KeyValuePair<string, object> goal) {
 
         List<Node> leaves = new List<Node>();
-        leaves = plan(leaves, actions, worldState, goal);
+        leaves = doPlan(leaves, actions, worldState, goal);
 
         if (leaves.Count == 0) {
-            // oh no, we didn't get a plan
             Debug.Log("NO PLAN");
             return null;
         }
+
+        //Store to Caravan
+        KeyValuePair<string, object> subGoal = new KeyValuePair<string, object>("Ca" + goal.Key.Substring(2), goal.Value);
+        GoapAction actionStore = actionList.Find(e => e.GetType().Name.Equals("InventoryToCar"));
+        buildGraph(leaves[leaves.Count - 1], leaves, new List<GoapAction> { actionStore }, subGoal);
 
         Queue<GoapAction> queue = new Queue<GoapAction>();
         foreach (Node a in leaves) {
             queue.Enqueue(a.action);
         }
 
-        // hooray we have a plan!
         return queue;
     }
-    /**
-	 * Plan what sequence of actions can fulfill the goal.
-	 * Returns null if a plan could not be found, or a list of the actions
-	 * that must be performed, in order, to fulfill the goal.
-	 */
-    private List<Node> plan(List<Node> leaves, List<GoapAction> actions, List<KeyValuePair<string, object>> worldState,
-                           KeyValuePair<string, object> goal) {
 
+    private List<Node> doPlan(List<Node> leaves, List<GoapAction> actions, List<KeyValuePair<string, object>> worldState, KeyValuePair<string, object> goal) {
 
-        // reset the actions so we can start fresh with them
         foreach (GoapAction a in actions) {
             actionList.Add(a);
             a.doReset();
         }
 
-        Debug.Log("Start World:" + GoapAgent.prettyPrint(worldState));
+        //Debug.Log("Start World:" + GoapAgent.prettyPrint(worldState));
 
         List<GoapAction> usableActions = findActions(worldState, new List<GoapAction>());
-
-        // build up the tree and record the leaf nodes that provide a solution to the goal.
-
 
         // build graph
         Node start = new Node(null, 0, worldState, null);
@@ -73,10 +65,9 @@ public class GoapPlanner {
 
         if (goal.Key.Contains("Pe")) {
             subGoal = new KeyValuePair<string, object>("InCi", 1);
-            leaves = plan(leaves, actions, worldState, subGoal);
+            leaves = doPlan(leaves, actions, worldState, subGoal);
             if (leaves.Count > 0) {
-                start = leaves[leaves.Count - 2];
-                leaves.RemoveAt(leaves.Count - 1);//Remove the caravan action
+                start = leaves[leaves.Count - 1];
             } else
                 return new List<Node>();
         }
@@ -113,31 +104,17 @@ public class GoapPlanner {
                     usedActionList.Add(a);
                 }
             }
-            //subGoal = new KeyValuePair<string, object>("InSu", 1);
-            //buildGraph(start, leaves, usableActions, subGoal);
-            //start = leaves[leaves.Count - 1];
-
-            //subGoal = new KeyValuePair<string, object>("InCl", 1);
-            //buildGraph(start, leaves, usableActions, subGoal);
-            //start = leaves[leaves.Count - 1];
-
-            //subGoal = new KeyValuePair<string, object>("InCi", 1);
-            //buildGraph(start, leaves, usableActions, subGoal);
-            //start = leaves[leaves.Count - 1];
-
         }
 
-        buildGraph(start, leaves, usableActions, goal);
-        start = leaves[leaves.Count - 1];
-
+        success = buildGraph(start, leaves, usableActions, goal);
         //Store to Caravan
-        subGoal = new KeyValuePair<string, object>("Ca" + goal.Key.Substring(2), goal.Value);
-        GoapAction actionStore = actionList.Find(e => e.GetType().Name.Equals("InventoryToCar"));
-        usableActions = new List<GoapAction> { actionStore };
-        success = buildGraph(start, leaves, usableActions, subGoal);
-        start = leaves[leaves.Count - 1];
+        //subGoal = new KeyValuePair<string, object>("Ca" + goal.Key.Substring(2), goal.Value);
+        //GoapAction actionStore = actionList.Find(e => e.GetType().Name.Equals("InventoryToCar"));
+        //usableActions = new List<GoapAction> { actionStore };
+        //success = buildGraph(start, leaves, usableActions, subGoal);
+        //start = leaves[leaves.Count - 1];
 
-        Debug.Log("End State:" + GoapAgent.prettyPrint(start.state));
+        //Debug.Log("End State:" + GoapAgent.prettyPrint(start.state));
 
         if (!success) {
             return new List<Node>();
@@ -172,14 +149,10 @@ public class GoapPlanner {
 
                 Node node = new Node(parent, parent.runningCost + action.cost, currentState, action);
                 leaves.Add(node);
-                //Debug.Log(GoapAgent.prettyPrint(currentState));
-                if (inState(goal, currentState)) {
-                    if (action.GetType().Name.Equals("CarToInventory")) {
 
-                    }
+                if (inState(goal, currentState)) {
                     return true;
                 } else {
-                    // not at a solution yet, so test all the remaining actions and branch out the tree                    
                     List<GoapAction> subset = new List<GoapAction>();
 
                     subset.AddRange(findActions(currentState, usableActions));
@@ -187,7 +160,6 @@ public class GoapPlanner {
                     subset.Remove(action);
                     subset.Add(action);
 
-                    //Debug.Log("New actions: " + GoapAgent.prettyPrint(subset));
                     return buildGraph(node, leaves, subset, goal);
                 }
             }
@@ -221,11 +193,6 @@ public class GoapPlanner {
 
         return newActions;
     }
-
-    /**
-	 * Check that all items in 'test' are in 'state'. If just one does not match or is not there
-	 * then this returns false.
-	 */
 
     private bool inState(KeyValuePair<string, object> t, List<KeyValuePair<string, object>> state) {
 
@@ -357,9 +324,6 @@ public class GoapPlanner {
         return state;
     }
 
-    /**
-	 * Used for building up the graph and holding the running costs of actions.
-	 */
     private class Node {
         public Node parent;
         public float runningCost;

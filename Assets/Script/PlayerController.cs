@@ -7,6 +7,7 @@ using UnityEngine.AI;
 public class PlayerController : MonoBehaviour, IGoap {
 
     public NavMeshAgent agent;
+    public NavMeshSurface surface;
 
     public GameObject planTextPrefab;
     public GameObject subGoalText;
@@ -19,7 +20,6 @@ public class PlayerController : MonoBehaviour, IGoap {
     private Trader traders;
 
     private int index = 0;
-
 
     private List<KeyValuePair<string, object>> worldData;
 
@@ -38,17 +38,18 @@ public class PlayerController : MonoBehaviour, IGoap {
         };
 
         subGoal = new List<KeyValuePair<string, object>> {
-            new KeyValuePair<string, object>("InTu", 2), //Capacity < 4           
-            new KeyValuePair<string, object>("InSa", 2), //Capacity < 4          
-            new KeyValuePair<string, object>("InCa", 1), //Capacity < 4        
-            new KeyValuePair<string, object>("InCi", 1), //Capacity < 4        
-            new KeyValuePair<string, object>("InCl", 1), //Capacity < 4        
-            new KeyValuePair<string, object>("InPe", 1), //Capacity < 4      
+            new KeyValuePair<string, object>("InTu", 2),           
+            new KeyValuePair<string, object>("InSa", 2),          
+            new KeyValuePair<string, object>("InCa", 1),        
+            new KeyValuePair<string, object>("InCi", 1),        
+            new KeyValuePair<string, object>("InCl", 1),        
+            new KeyValuePair<string, object>("InPe", 1),      
             new KeyValuePair<string, object>("InSu", 1)
         };
     }
 
     void Start() {
+        surface.BuildNavMesh();
         traders = GameObject.FindGameObjectWithTag("traders").GetComponent<Trader>();
         caravan = GameObject.FindGameObjectWithTag("Caravan").GetComponent<Caravan>();
         inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
@@ -108,7 +109,6 @@ public class PlayerController : MonoBehaviour, IGoap {
 
     public void PlanFound(KeyValuePair<string, object> goal, Queue<GoapAction> actions) {
 
-        Debug.Log("<color=green>Plan found</color> " + GoapAgent.prettyPrint(actions));
         GameObject[] texts = GameObject.FindGameObjectsWithTag("plan_text");
         for (int i = 0; i < texts.Length; i++) {
             GameObject.Destroy(texts[i]);

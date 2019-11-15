@@ -65,8 +65,7 @@ public sealed class GoapAgent : MonoBehaviour {
             List<KeyValuePair<string, object>> worldState = dataProvider.GetWorldState();
 
             KeyValuePair<string, object> goal = dataProvider.GetSubGoals();
-
-
+            
             if (!goal.Equals(new KeyValuePair<string, object>())) {
                 // Plan
                 Queue<GoapAction> plan = planner.plan(availableActions, worldState, goal);
@@ -119,8 +118,6 @@ public sealed class GoapAgent : MonoBehaviour {
 
             GoapAction action = currentActions.Peek();
 
-
-
             if (action.isDone()) {
                 // the action is done. Remove it so we can perform the next one
                 action.doReset();
@@ -156,7 +153,7 @@ public sealed class GoapAgent : MonoBehaviour {
 
 
             } else {
-                Debug.Log(prettyPrint(action));
+                //Debug.Log(prettyPrint(action));
                 // no actions left, move to Plan state
                 fsm.popState();
                 fsm.pushState(idleState);
