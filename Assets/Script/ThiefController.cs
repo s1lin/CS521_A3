@@ -33,25 +33,31 @@ public class ThiefController : MonoBehaviour {
         actionDestination = traders.traderPositions[0];
     }
 
-    // Update is called once per frame
     void Update() {
-        if (!inWait && isActionFinished) {
-            StartCoroutine("action");
+        if (stealCount >= 2) {
+            Wondering();
+        }else if (!inWait && isActionFinished) {
+            StartCoroutine("Action");
         } else {
-            if (isWondering || stealCount >= 2)
+            if (isWondering) {
                 Wondering();
+            }                
             else {
                 if (isCaravan) {
                     if (MoveToCaravan() && !isActionFinished) {
                         isActionFinished = StealRandomItemFromCar();
+                        isWondering = true;
                     }
                 } else {
-                    if (MoveToPlayer() && !isActionFinished)
+                    if (MoveToPlayer() && !isActionFinished) {
                         isActionFinished = StealRandomItemFromInv();
+                        isWondering = true;
+                    }
                 }
             }
         }
     }
+
     private bool StealRandomItemFromCar() {
 
         List<KeyValuePair<SpiceName, int>> values = new List<KeyValuePair<SpiceName, int>>{
@@ -71,7 +77,6 @@ public class ThiefController : MonoBehaviour {
             caravan.RemoveItemByOne(values[remove].Key);
             stealCount++;
             StealCount.text = stealCount.ToString();
-            return true;
         }
 
         return true;
@@ -97,13 +102,12 @@ public class ThiefController : MonoBehaviour {
             inventory.RemoveItemByQuanlity(values[remove].Key, 1);
             stealCount++;
             StealCount.text = stealCount.ToString();
-            return true;
         }
 
         return true;
     }
 
-    public IEnumerator action() {
+    public IEnumerator Action() {
 
         float stoleChance = Random.Range(0f, 1f);
 
@@ -111,16 +115,15 @@ public class ThiefController : MonoBehaviour {
             isWondering = false;
             isActionFinished = false;
             float carOrIn = Random.Range(0f, 1f);
-            //if (carOrIn <= 0.5f) {
-            isCaravan = false;
-            MoveToPlayer();
-            //} else {
-            //isCaravan = true;
-            //MoveToCaravan();
-            //}
+            if (carOrIn <= 0.5f) {
+                isCaravan = false;
+                MoveToPlayer();
+            } else {
+                isCaravan = true;
+                MoveToCaravan();
+            }
         } else {
             isWondering = true;
-            Wondering();
         }
 
         inWait = true;
@@ -134,23 +137,22 @@ public class ThiefController : MonoBehaviour {
 
     public bool MoveToCaravan() {
         agent.SetDestination(caravan.transform.position);
-        return Vector3.Distance(transform.position, caravan.transform.position) < 3f;
+        return Vector3.Distance(transform.position, caravan.transform.position) < 5f;
     }
 
     public void Wondering() {
 
+        if (Vector3.Distance(transform.position, actionDestination) < 5f) {
+            inWonderRange = true;
+            preIndex = GetNextIndex(preIndex);            
+        }
+
         if (inWonderRange) {
-            int nexIndex = GetNextIndex(preIndex);
-            preIndex = nexIndex;
-            agent.SetDestination(traders.traderPositions[nexIndex]);
-            actionDestination = traders.traderPositions[nexIndex];
+            actionDestination = traders.traderPositions[preIndex];
             inWonderRange = false;
         }
 
-        if (Vector3.Distance(transform.position, actionDestination) < 5f) {
-            inWonderRange = true;
-        }
-
+        agent.SetDestination(traders.traderPositions[preIndex]);
     }
 
     private int GetNextIndex(int preIndex) {

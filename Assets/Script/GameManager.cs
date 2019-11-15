@@ -22,10 +22,4 @@ public class GameManager : MonoBehaviour {
 
         return new Vector3(x, y, -1f);
     }
-
-
-    // Update is called once per frame
-    void Update() {
-
-    }
 }

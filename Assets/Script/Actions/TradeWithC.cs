@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 class TradeWithC : GoapAction {
@@ -11,38 +7,23 @@ class TradeWithC : GoapAction {
     private bool isSucc = false;
     private bool isFinished = false;
 
+    public TradeWithC() {
+        AddPrecondition("InSa", 2);
+
+        AddEffect("InSa", -2);
+        AddEffect("InCa", 1);
+        AddEffect("Capacity", 1);
+    }
+
     void Start() {
-        target = 2;
-
-        addPrecondition("InSa", 2);
-
-        addEffect("InSa", -2);
-        addEffect("InCa", 1);
-        addEffect("Capacity", 1);
-
+        traderIndex = 2;
     }
 
-    public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
-        foreach (KeyValuePair<string, object> s in state) {
-            if (s.Key.Equals("InSa"))
-                return (int)s.Value >= 2;
-        }
-        return false;
+    public override void DoAction(GameObject agent) {
+        StartCoroutine(Action(agent));
     }
 
-    public override bool isDone() {
-        return isFinished;
-    }
-
-    public override bool IsSucc() {
-        return isSucc;
-    }
-
-    public override void perform(GameObject agent) {
-        StartCoroutine(performAction(agent));
-    }
-
-    public IEnumerator performAction(GameObject agent) {
+    public IEnumerator Action(GameObject agent) {
 
         Inventory inventory = agent.GetComponent<Inventory>();
         bool succ = false;
@@ -59,12 +40,24 @@ class TradeWithC : GoapAction {
         isFinished = true;
         isSucc = succ;
     }
-
-    public override bool requiresInRange() {
-        return true;// need to be near a trader
+ 
+    public override bool IsActionUsable(List<KeyValuePair<string, object>> state) {
+        foreach (KeyValuePair<string, object> s in state) {
+            if (s.Key.Equals("InSa"))
+                return (int)s.Value >= 2;
+        }
+        return false;
     }
 
-    public override void reset() {
+    public override bool IsDone() {
+        return isFinished;
+    }
+
+    public override bool IsSucc() {
+        return isSucc;
+    }
+
+    public override void Reset() {
         isFinished = false;
         isSucc = false;
     }

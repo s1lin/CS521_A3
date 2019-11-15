@@ -7,47 +7,26 @@ class TradeWithE : GoapAction {
     private bool isSucc = false;
     private bool isFinished = false;
 
+    public TradeWithE() {
+
+        AddPrecondition("InCa", 1);
+        AddPrecondition("InTu", 1);
+
+        AddEffect("InCa", -1);
+        AddEffect("InTu", -1);
+        AddEffect("InCl", +1);
+        AddEffect("Capacity", 1);
+    }
+
     void Start() {
-        target = 4;
-
-        addPrecondition("InCa", 1);
-        addPrecondition("InTu", 1);
-
-        addEffect("InCa", -1);
-        addEffect("InTu", -1);
-        addEffect("InCl", +1);
-        addEffect("Capacity", 1);
+        traderIndex = 4;
     }
 
-    public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
-
-        bool satisfied1 = false;
-        bool satisfied2 = false;
-
-        foreach (KeyValuePair<string, object> s in state) {
-            if (s.Key.Equals("InTu") && (int)s.Value >= 1) {
-                satisfied1 = true;
-            }
-            if (s.Key.Equals("InCa") && (int)s.Value >= 2) {
-                satisfied2 = true;
-            }
-        }
-        return satisfied1 && satisfied2;
+    public override void DoAction(GameObject agent) {
+        StartCoroutine(Action(agent));
     }
 
-    public override bool isDone() {
-        return isFinished;
-    }
-
-    public override bool IsSucc() {
-        return isSucc;
-    }
-
-    public override void perform(GameObject agent) {
-        StartCoroutine(performAction(agent));
-    }
-
-    public IEnumerator performAction(GameObject agent) {
+    public IEnumerator Action(GameObject agent) {
 
         Inventory inventory = agent.GetComponent<Inventory>();
         bool succ = false;
@@ -65,12 +44,31 @@ class TradeWithE : GoapAction {
         isSucc = succ;
 
     }
+    public override bool IsActionUsable(List<KeyValuePair<string, object>> state) {
 
-    public override bool requiresInRange() {
-        return true;// need to be near a trader
+        bool satisfied1 = false;
+        bool satisfied2 = false;
+
+        foreach (KeyValuePair<string, object> s in state) {
+            if (s.Key.Equals("InTu") && (int)s.Value >= 1) {
+                satisfied1 = true;
+            }
+            if (s.Key.Equals("InCa") && (int)s.Value >= 2) {
+                satisfied2 = true;
+            }
+        }
+        return satisfied1 && satisfied2;
     }
 
-    public override void reset() {
+    public override bool IsDone() {
+        return isFinished;
+    }
+
+    public override bool IsSucc() {
+        return isSucc;
+    }
+
+    public override void Reset() {
         isFinished = false;
         isSucc = false;
     }

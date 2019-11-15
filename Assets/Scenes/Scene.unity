@@ -38486,8 +38486,8 @@ MonoBehaviour:
   traderPrefab: {fileID: 8731886742221569616, guid: e40c281af5a3f5949aeb1a05c99d4027,
     type: 3}
   traderPositions:
-  - {x: 8, y: -16.5, z: -1}
-  - {x: -7.5, y: -16.5, z: -1}
+  - {x: 8, y: -16, z: -1}
+  - {x: -7.5, y: -16, z: -1}
   - {x: -18.5, y: 6.4, z: -1}
   - {x: -18.5, y: -5.5, z: -1}
   - {x: -7.5, y: 18, z: -1}

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 class InventoryToCar : GoapAction {
@@ -11,26 +7,14 @@ class InventoryToCar : GoapAction {
     private bool isSucc = false;
     private bool isFinished = false;
 
-    void Start() {
-
-        addEffect("Capacity", 4);
+    public InventoryToCar() {
+        AddEffect("Capacity", 4);
     }
-    public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
-        return false;
-    }
-
-    public override bool isDone() {
-        return isFinished;
-    }
-    public override bool IsSucc() {
-        return isSucc;
+    public override void DoAction(GameObject agent) {
+        StartCoroutine(Action(agent));
     }
 
-    public override void perform(GameObject agent) {
-        StartCoroutine(performAction(agent));
-    }
-
-    public IEnumerator performAction(GameObject agent) {
+    public IEnumerator Action(GameObject agent) {
 
         Inventory inventory = agent.GetComponent<Inventory>();
         Caravan caravan = GameObject.FindGameObjectWithTag("Caravan").GetComponent<Caravan>();
@@ -59,13 +43,19 @@ class InventoryToCar : GoapAction {
         isSucc = true;
     }
 
-    public override bool requiresInRange() {
-        return true;
+    public override bool IsActionUsable(List<KeyValuePair<string, object>> state) {
+        return false;
     }
 
-    public override void reset() {
+    public override bool IsDone() {
+        return isFinished;
+    }
+    public override bool IsSucc() {
+        return isSucc;
+    }
+
+    public override void Reset() {
         isFinished = false;
         isSucc = false;
     }
 }
-

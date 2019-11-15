@@ -7,28 +7,16 @@ class CarToInventory : GoapAction {
     private bool isSucc = false;
     private bool isFinished = false;
 
-    public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
-        return false;
+    public override void DoAction(GameObject agent) {
+        StartCoroutine(Action(agent));
     }
 
-    public override bool isDone() {
-        return isFinished;
-    }
-
-    public override bool IsSucc() {
-        return isSucc;
-    }
-
-    public override void perform(GameObject agent) {
-        StartCoroutine(performAction(agent));
-    }
-
-    public IEnumerator performAction(GameObject agent) {
+    public IEnumerator Action(GameObject agent) {
 
         Inventory inventory = agent.GetComponent<Inventory>();
         bool succ = false;
 
-        foreach(KeyValuePair<SpiceName, int> value in takeout) {
+        foreach (KeyValuePair<SpiceName, int> value in takeout) {
             inventory.GetItemFromCaravan(value.Key, value.Value);
             succ = true;
         }
@@ -41,11 +29,19 @@ class CarToInventory : GoapAction {
         isSucc = succ;
     }
 
-    public override bool requiresInRange() {
-        return true;
+    public override bool IsActionUsable(List<KeyValuePair<string, object>> state) {
+        return false;
     }
 
-    public override void reset() {
+    public override bool IsDone() {
+        return isFinished;
+    }
+
+    public override bool IsSucc() {
+        return isSucc;
+    }
+
+    public override void Reset() {
         isFinished = false;
         isSucc = false;
         takeout = new List<KeyValuePair<SpiceName, int>>();

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 class TradeWithH : GoapAction {
@@ -11,23 +7,48 @@ class TradeWithH : GoapAction {
     private bool isSucc = false;
     private bool isFinished = false;
 
-    void Start() {
+    public TradeWithH() {
 
-        target = 7;
+        AddPrecondition("InSa", 1);
+        AddPrecondition("InCi", 1);
+        AddPrecondition("InCl", 1);
 
-        addPrecondition("InSa", 1);
-        addPrecondition("InCi", 1);
-        addPrecondition("InCl", 1);
-
-        addEffect("InSa", -1);
-        addEffect("InCi", -1);
-        addEffect("InCl", -1);
-        addEffect("InSu", 1);
-        addEffect("Capacity", 2);
+        AddEffect("InSa", -1);
+        AddEffect("InCi", -1);
+        AddEffect("InCl", -1);
+        AddEffect("InSu", 1);
+        AddEffect("Capacity", 2);
 
     }
 
-    public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
+    void Start() {
+        traderIndex = 7;
+    }
+
+    public override void DoAction(GameObject agent) {
+        StartCoroutine(Action(agent));
+    }
+
+    public IEnumerator Action(GameObject agent) {
+
+        Inventory inventory = agent.GetComponent<Inventory>();
+        bool succ = false;
+
+        if (inventory.RemoveItemByQuanlity(SpiceName.Sa, 1) && inventory.RemoveItemByQuanlity(SpiceName.Ci, 1) && inventory.RemoveItemByQuanlity(SpiceName.Cl, 1)) {
+            inventory.GetItemFromTrader(SpiceName.Su, 1);
+            isFinished = true;
+            succ = true;
+        }
+
+        inWait = true;
+        yield return new WaitForSecondsRealtime(actionDuration);
+        inWait = false;
+
+        isFinished = true;
+        isSucc = succ;
+    }
+
+    public override bool IsActionUsable(List<KeyValuePair<string, object>> state) {
 
         bool satisfied1 = false;
         bool satisfied2 = false;
@@ -47,43 +68,15 @@ class TradeWithH : GoapAction {
         return satisfied1 && satisfied2 && satisfied3;
     }
 
-    public override bool isDone() {
+    public override bool IsDone() {
         return isFinished;
     }
     public override bool IsSucc() {
         return isSucc;
     }
 
-    public override void perform(GameObject agent) {
-        StartCoroutine(performAction(agent));
-    }
-
-    public IEnumerator performAction(GameObject agent) {
-
-        Inventory inventory = agent.GetComponent<Inventory>();
-        bool succ = false;
-
-        if (inventory.RemoveItemByQuanlity(SpiceName.Sa, 1) && inventory.RemoveItemByQuanlity(SpiceName.Ci, 1) && inventory.RemoveItemByQuanlity(SpiceName.Cl, 1)) {
-            inventory.GetItemFromTrader(SpiceName.Su, 1);
-            isFinished = true;
-            succ = true;
-        }
-
-        inWait = true;
-        yield return new WaitForSecondsRealtime(actionDuration);
-        inWait = false;
-
-        isFinished = true;
-        isSucc = succ;
-    }
-
-    public override bool requiresInRange() {
-        return true;// need to be near a trader
-    }
-
-    public override void reset() {
+    public override void Reset() {
         isFinished = false;
         isSucc = false;
     }
 }
-

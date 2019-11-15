@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
@@ -84,18 +83,18 @@ public class PlayerController : MonoBehaviour, IGoap {
     }
 
     public bool MoveAgent(GoapAction nextAction) {
-        //actionText.GetComponent<Text>().text = GoapAgent.prettyPrint(nextAction) + "Action Running";
+       
         Vector3 pos;
         if (nextAction.GetType().Name.Equals("InventoryToCar") || nextAction.GetType().Name.Equals("CarToInventory")) {
             pos = caravan.transform.position;
             agent.SetDestination(pos);
         } else {
-            pos = traders.traderPositions[nextAction.target];
+            pos = traders.traderPositions[nextAction.traderIndex];
             agent.SetDestination(pos);
         }
 
         if (Vector3.Distance(transform.position, pos) < 5f) {
-            nextAction.setInRange(true);
+            nextAction.inRange = true;
             return true;
         }
         
@@ -103,7 +102,7 @@ public class PlayerController : MonoBehaviour, IGoap {
     }
 
     public void PlanAborted(GoapAction aborter) {
-        actionText.GetComponent<Text>().text = "Plan " + planIndex + " action " + GoapAgent.prettyPrint(aborter) + " Aborted.";
+        actionText.GetComponent<Text>().text = "Plan " + planIndex + " action " + GoapAgent.Display(aborter) + " Aborted.";
     }
 
     public void PlanFailed(KeyValuePair<string, object> failedGoal) {
@@ -121,7 +120,7 @@ public class PlayerController : MonoBehaviour, IGoap {
         textObject.GetComponent<Text>().text = "The Number " + planIndex.ToString() + " Plan.";
         foreach (GoapAction a in actions) {
             textObject = Instantiate(planTextPrefab, planPlane.transform) as GameObject;
-            textObject.GetComponent<Text>().text = GoapAgent.prettyPrint(a);
+            textObject.GetComponent<Text>().text = GoapAgent.Display(a);
         }
         planIndex++;
 

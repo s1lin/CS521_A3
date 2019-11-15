@@ -8,38 +8,23 @@ class TradeWithD : GoapAction {
     private bool isSucc = false;
     private bool isFinished = false;
 
+    public TradeWithD() {
+
+        AddPrecondition("InTu", 4);
+
+        AddEffect("InTu", -4);
+        AddEffect("InCi", 1);
+        AddEffect("Capacity", 3);
+    }
     void Start() {
-        target = 3;
-
-        addPrecondition("InTu", 4);
-
-        addEffect("InTu", -4);
-        addEffect("InCi", 1);
-        addEffect("Capacity", 3);
+        traderIndex = 3;
     }
 
-
-    public override bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state) {
-        foreach (KeyValuePair<string, object> s in state) {
-            if (s.Key.Equals("InTu"))
-                return (int)s.Value == 4;
-        }
-        return false;
+    public override void DoAction(GameObject agent) {
+        StartCoroutine(Action(agent));
     }
 
-    public override bool isDone() {
-        return isFinished;
-    }
-
-    public override bool IsSucc() {
-        return isSucc;
-    }
-
-    public override void perform(GameObject agent) {
-        StartCoroutine(performAction(agent));
-    }
-
-    public IEnumerator performAction(GameObject agent) {
+    public IEnumerator Action(GameObject agent) {
 
         Inventory inventory = agent.GetComponent<Inventory>();
         bool succ = false;
@@ -56,13 +41,24 @@ class TradeWithD : GoapAction {
         isSucc = succ;
     }
 
-    public override bool requiresInRange() {
-        return true;// need to be near a trader
+    public override bool IsActionUsable(List<KeyValuePair<string, object>> state) {
+        foreach (KeyValuePair<string, object> s in state) {
+            if (s.Key.Equals("InTu"))
+                return (int)s.Value == 4;
+        }
+        return false;
     }
 
-    public override void reset() {
+    public override bool IsDone() {
+        return isFinished;
+    }
+
+    public override bool IsSucc() {
+        return isSucc;
+    }
+
+    public override void Reset() {
         isFinished = false;
         isSucc = false;
     }
 }
-

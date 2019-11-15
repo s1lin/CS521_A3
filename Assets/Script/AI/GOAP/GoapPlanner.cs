@@ -11,10 +11,10 @@ public class GoapPlanner {
         usedActionList = new HashSet<GoapAction>();
     }
 
-    public Queue<GoapAction> plan(List<GoapAction> actions, List<KeyValuePair<string, object>> worldState, KeyValuePair<string, object> goal) {
+    public Queue<GoapAction> Plan(List<GoapAction> actions, List<KeyValuePair<string, object>> worldState, KeyValuePair<string, object> goal) {
 
-        List<Node> leaves = new List<Node>();
-        leaves = doPlan(leaves, actions, worldState, goal);
+        List<GoapNode> leaves = new List<GoapNode>();
+        leaves = DoPlan(leaves, actions, worldState, goal);
 
         if (leaves.Count == 0) {
             Debug.Log("NO PLAN");
@@ -24,39 +24,39 @@ public class GoapPlanner {
         //Store to Caravan
         KeyValuePair<string, object> subGoal = new KeyValuePair<string, object>("Ca" + goal.Key.Substring(2), goal.Value);
         GoapAction actionStore = actionList.Find(e => e.GetType().Name.Equals("InventoryToCar"));
-        buildGraph(leaves[leaves.Count - 1], leaves, new List<GoapAction> { actionStore }, subGoal);
+        BuildGOAP(leaves[leaves.Count - 1], leaves, new List<GoapAction> { actionStore }, subGoal);
 
         Queue<GoapAction> queue = new Queue<GoapAction>();
-        foreach (Node a in leaves) {
+        foreach (GoapNode a in leaves) {
             queue.Enqueue(a.action);
         }
 
         return queue;
     }
 
-    private List<Node> doPlan(List<Node> leaves, List<GoapAction> actions, List<KeyValuePair<string, object>> worldState, KeyValuePair<string, object> goal) {
+    private List<GoapNode> DoPlan(List<GoapNode> leaves, List<GoapAction> actions, List<KeyValuePair<string, object>> worldState, KeyValuePair<string, object> goal) {
 
         foreach (GoapAction a in actions) {
             actionList.Add(a);
-            a.doReset();
+            a.DoReset();
         }
 
-        Debug.Log("Start World:" + GoapAgent.prettyPrint(worldState));
+        Debug.Log("Start World:" + GoapAgent.Display(worldState));
 
-        List<GoapAction> usableActions = findActions(worldState, new List<GoapAction>());
+        List<GoapAction> usableActions = FindUsableActions(worldState, new List<GoapAction>());
 
         // build graph
-        Node start = new Node(null, 0, worldState, null);
+        GoapNode start = new GoapNode(null, 0, worldState, null);
         bool success = false;
         KeyValuePair<string, object> subGoal;
 
         if (goal.Key.Contains("Ci")) {
             subGoal = new KeyValuePair<string, object>("InTu", 2);
-            buildGraph(start, leaves, usableActions, subGoal);
+            BuildGOAP(start, leaves, usableActions, subGoal);
             start = leaves[leaves.Count - 1];
 
             subGoal = new KeyValuePair<string, object>("InTu", 4);
-            buildGraph(start, leaves, usableActions, subGoal);
+            BuildGOAP(start, leaves, usableActions, subGoal);
             start = leaves[leaves.Count - 1];
 
             GoapAction actionD = actionList.Find(e => e.GetType().Name.Equals("TradeWithD"));
@@ -65,25 +65,25 @@ public class GoapPlanner {
 
         if (goal.Key.Contains("Pe")) {
             subGoal = new KeyValuePair<string, object>("InCi", 1);
-            leaves = doPlan(leaves, actions, worldState, subGoal);
+            leaves = DoPlan(leaves, actions, worldState, subGoal);
             if (leaves.Count > 0) {
                 start = leaves[leaves.Count - 1];
             } else
-                return new List<Node>();
+                return new List<GoapNode>();
         }
 
         if (goal.Key.Contains("Su")) {
 
             for (int i = 0; i < 2; i++) {
                 subGoal = new KeyValuePair<string, object>("InCa", 2);
-                buildGraph(start, leaves, usableActions, subGoal);
+                BuildGOAP(start, leaves, usableActions, subGoal);
                 start = leaves[leaves.Count - 1];
 
                 //Store to Caravan
                 subGoal = new KeyValuePair<string, object>("Ca" + subGoal.Key.Substring(2), (int)subGoal.Value * (i + 1));
                 GoapAction store = actionList.Find(e => e.GetType().Name.Equals("InventoryToCar"));
                 usableActions = new List<GoapAction> { store };
-                success = buildGraph(start, leaves, usableActions, subGoal);
+                success = BuildGOAP(start, leaves, usableActions, subGoal);
                 start = leaves[leaves.Count - 1];
 
                 GoapAction actionA = actionList.Find(e => e.GetType().Name.Equals("TradeWithA"));
@@ -94,88 +94,69 @@ public class GoapPlanner {
             subGoal = new KeyValuePair<string, object>("InCa", 4);
             GoapAction take = actionList.Find(e => e.GetType().Name.Equals("CarToInventory"));
             usableActions = new List<GoapAction> { take };
-            success = buildGraph(start, leaves, usableActions, subGoal);
+            success = BuildGOAP(start, leaves, usableActions, subGoal);
             start = leaves[leaves.Count - 1];
 
             usableActions = new List<GoapAction>();
             foreach (GoapAction a in actions) {
-                if (a.checkProceduralPrecondition(start.state)) {
+                if (a.IsActionUsable(start.state)) {
                     usableActions.Add(a);
                     usedActionList.Add(a);
                 }
             }
         }
 
-        success = buildGraph(start, leaves, usableActions, goal);
-        //Store to Caravan
-        //subGoal = new KeyValuePair<string, object>("Ca" + goal.Key.Substring(2), goal.Value);
-        //GoapAction actionStore = actionList.Find(e => e.GetType().Name.Equals("InventoryToCar"));
-        //usableActions = new List<GoapAction> { actionStore };
-        //success = buildGraph(start, leaves, usableActions, subGoal);
-        //start = leaves[leaves.Count - 1];
-
-        //Debug.Log("End State:" + GoapAgent.prettyPrint(start.state));
+        success = BuildGOAP(start, leaves, usableActions, goal);
 
         if (!success) {
-            return new List<Node>();
+            return new List<GoapNode>();
         }
 
         return leaves;
 
     }
 
-    public List<KeyValuePair<string, object>> findSubGoal(List<KeyValuePair<string, object>> goal) {
-        List<KeyValuePair<string, object>> subGoal = new List<KeyValuePair<string, object>>() {
-            new KeyValuePair<string, object>("Capacity", 2)
-        };
-        return subGoal;
-    }
-
-
-    private bool buildGraph(Node parent, List<Node> leaves, List<GoapAction> usableActions, KeyValuePair<string, object> goal) {
+    private bool BuildGOAP(GoapNode parent, List<GoapNode> graph, List<GoapAction> usableActions, KeyValuePair<string, object> goal) {
 
         List<KeyValuePair<string, object>> currentState;
 
         foreach (GoapAction action in usableActions) {
 
-            if (inState(action.Preconditions, parent.state)) {
+            if (IsStateSatisfied(action.preconditions, parent.state)) {
                 if (action.GetType().Name.Equals("InventoryToCar")) {
-                    currentState = popluateStae(parent.state);
+                    currentState = ApplyStateChange(parent.state);
                 } else if (action.GetType().Name.Equals("CarToInventory")) {
-                    currentState = popluateStae(parent.state, goal, action);
+                    currentState = ApplyStateChange(parent.state, goal, action);
                 } else {
-                    currentState = populateState(parent.state, action.Effects);
+                    currentState = ApplyStateChange(parent.state, action.effects);
                 }
 
-                Node node = new Node(parent, parent.runningCost + action.cost, currentState, action);
-                leaves.Add(node);
+                GoapNode node = new GoapNode(parent, parent.runningCost + action.cost, currentState, action);
+                graph.Add(node);
 
-                if (inState(goal, currentState)) {
+                if (IsStateSatisfied(goal, currentState)) {
                     return true;
                 } else {
                     List<GoapAction> subset = new List<GoapAction>();
 
-                    subset.AddRange(findActions(currentState, usableActions));
+                    subset.AddRange(FindUsableActions(currentState, usableActions));
                     subset.AddRange(usableActions);
                     subset.Remove(action);
                     subset.Add(action);
 
-                    return buildGraph(node, leaves, subset, goal);
+                    return BuildGOAP(node, graph, subset, goal);
                 }
             }
         }
         return false;
     }
 
-    /**
-	 * Create a subset of the actions excluding the removeMe one. Creates a new set.
-	 */
-    private List<GoapAction> findActions(List<KeyValuePair<string, object>> currentState, List<GoapAction> exclude) {
+    private List<GoapAction> FindUsableActions(List<KeyValuePair<string, object>> currentState, List<GoapAction> exclude) {
         List<GoapAction> newActions = new List<GoapAction>();
 
         foreach (GoapAction a in actionList) {
             if (!exclude.Contains(a) && !usedActionList.Contains(a)) {
-                if (a.checkProceduralPrecondition(currentState)) {
+                if (a.IsActionUsable(currentState)) {
                     newActions.Add(a);
                     usedActionList.Add(a);
                 }
@@ -184,7 +165,7 @@ public class GoapPlanner {
 
         foreach (GoapAction a in actionList) {
             if (!exclude.Contains(a) && !newActions.Contains(a)) {
-                if (a.checkProceduralPrecondition(currentState)) {
+                if (a.IsActionUsable(currentState)) {
                     newActions.Add(a);
                     usedActionList.Add(a);
                 }
@@ -194,12 +175,12 @@ public class GoapPlanner {
         return newActions;
     }
 
-    private bool inState(KeyValuePair<string, object> t, List<KeyValuePair<string, object>> state) {
+    private bool IsStateSatisfied(KeyValuePair<string, object> test, List<KeyValuePair<string, object>> state) {
 
         bool match = false;
         foreach (KeyValuePair<string, object> s in state) {
-            if (s.Key.Equals(t.Key)) {
-                match = (int)s.Value >= (int)t.Value;
+            if (s.Key.Equals(test.Key)) {
+                match = (int)s.Value >= (int)test.Value;
                 if (match)
                     break;
             }
@@ -207,7 +188,7 @@ public class GoapPlanner {
         return match;
     }
 
-    private bool inState(List<KeyValuePair<string, object>> test, List<KeyValuePair<string, object>> state) {
+    private bool IsStateSatisfied(List<KeyValuePair<string, object>> test, List<KeyValuePair<string, object>> state) {
         bool allMatch = true;
         foreach (KeyValuePair<string, object> t in test) {
             bool match = false;
@@ -223,7 +204,8 @@ public class GoapPlanner {
         }
         return allMatch;
     }
-    private List<KeyValuePair<string, object>> popluateStae(List<KeyValuePair<string, object>> state) {
+
+    private List<KeyValuePair<string, object>> ApplyStateChange(List<KeyValuePair<string, object>> state) {
 
         List<KeyValuePair<string, object>> tempState = new List<KeyValuePair<string, object>>();
         List<KeyValuePair<string, object>> currentState = new List<KeyValuePair<string, object>>();
@@ -255,7 +237,7 @@ public class GoapPlanner {
         return currentState;
     }
 
-    private List<KeyValuePair<string, object>> popluateStae(List<KeyValuePair<string, object>> state, KeyValuePair<string, object> goal, GoapAction action) {
+    private List<KeyValuePair<string, object>> ApplyStateChange(List<KeyValuePair<string, object>> state, KeyValuePair<string, object> goal, GoapAction action) {
 
         List<KeyValuePair<string, object>> currentState = new List<KeyValuePair<string, object>>();
 
@@ -290,19 +272,19 @@ public class GoapPlanner {
         return currentState;
     }
 
-    private List<KeyValuePair<string, object>> populateState(
-        List<KeyValuePair<string, object>> currentState, List<KeyValuePair<string, object>> stateChange) {
+    private List<KeyValuePair<string, object>> ApplyStateChange(List<KeyValuePair<string, object>> currentState, List<KeyValuePair<string, object>> changeState) {
 
         List<KeyValuePair<string, object>> state = new List<KeyValuePair<string, object>>();
-        // copy the KVPs over as new objects
+
         foreach (KeyValuePair<string, object> s in currentState) {
             state.Add(new KeyValuePair<string, object>(s.Key, s.Value));
         }
 
-        foreach (KeyValuePair<string, object> change in stateChange) {
-            // if the key exists in the current state, update the Value
+        foreach (KeyValuePair<string, object> change in changeState) {
+
             bool exists = false;
             int sValue = 0;
+
             foreach (KeyValuePair<string, object> s in state) {
                 if (s.Key.Equals(change.Key)) {
                     sValue = (int)s.Value;
@@ -312,25 +294,23 @@ public class GoapPlanner {
             }
 
             if (exists) {
-                state.RemoveAll((KeyValuePair<string, object> kvp) => { return kvp.Key.Equals(change.Key); });
+                state.RemoveAll(e => { return e.Key.Equals(change.Key); });
                 KeyValuePair<string, object> updated = new KeyValuePair<string, object>(change.Key, (int)change.Value + sValue);
                 state.Add(updated);
-            }
-            // if it does not exist in the current state, add it
-            else {
+            } else {
                 state.Add(new KeyValuePair<string, object>(change.Key, change.Value));
             }
         }
         return state;
     }
 
-    private class Node {
-        public Node parent;
+    private class GoapNode {
+        public GoapNode parent;
         public float runningCost;
         public List<KeyValuePair<string, object>> state;
         public GoapAction action;
 
-        public Node(Node parent, float runningCost, List<KeyValuePair<string, object>> state, GoapAction action) {
+        public GoapNode(GoapNode parent, float runningCost, List<KeyValuePair<string, object>> state, GoapAction action) {
             this.parent = parent;
             this.runningCost = runningCost;
             this.state = state;
@@ -339,5 +319,3 @@ public class GoapPlanner {
     }
 
 }
-
-

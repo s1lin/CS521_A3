@@ -1,21 +1,18 @@
-
 using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
 
-public abstract class GoapAction : MonoBehaviour {
-    
-    private List<KeyValuePair<string, object>> preconditions;
-    private List<KeyValuePair<string, object>> effects;
+public abstract class GoapAction : MonoBehaviour {    
+
+    public List<KeyValuePair<string, object>> preconditions;
+    public List<KeyValuePair<string, object>> effects;
 
     public List<KeyValuePair<SpiceName, int>> takeout;
 
-    private bool inRange = false;
-
-    public float actionDuration = 10f;//about 1s
+    public float actionDuration = 15f;
     public float cost = 1f;
-    public int target = -1;
+    public int traderIndex = -1;
 
+    public bool inRange = false;
     public bool inWait = false;
     public bool init = true;
 
@@ -25,74 +22,32 @@ public abstract class GoapAction : MonoBehaviour {
         takeout = new List<KeyValuePair<SpiceName, int>>();
     }
 
-    public void doReset() {
+    public void DoReset() {
         inRange = false;
         inWait = false;
         init = true;
-        reset();
+        Reset();
     }
 
-    public bool isInRange() {
+    public bool IsInRange() {
         return inRange;
     }
 
-    public void setInRange(bool inRange) {
-        this.inRange = inRange;
-    }
-
-    public void addPrecondition(string key, object value) {
+    public void AddPrecondition(string key, object value) {
         preconditions.Add(new KeyValuePair<string, object>(key, value));
     }
 
-    public void removePrecondition(string key) {
-        KeyValuePair<string, object> remove = default(KeyValuePair<string, object>);
-        foreach (KeyValuePair<string, object> kvp in preconditions) {
-            if (kvp.Key.Equals(key))
-                remove = kvp;
-        }
-        if (!default(KeyValuePair<string, object>).Equals(remove))
-            preconditions.Remove(remove);
-    }
-
-    public void addEffect(string key, int value) {
+    public void AddEffect(string key, int value) {
         effects.Add(new KeyValuePair<string, object>(key, value));
     }
 
-    public void removeEffect(string key) {
-        KeyValuePair<string, object> remove = default(KeyValuePair<string, object>);
-        foreach (KeyValuePair<string, object> kvp in effects) {
-            if (kvp.Key.Equals(key))
-                remove = kvp;
-        }
-        if (!default(KeyValuePair<string, object>).Equals(remove))
-            effects.Remove(remove);
-    }
+    public abstract void Reset();
 
-    public List<KeyValuePair<string, object>> Preconditions {
-        get {
-            return preconditions;
-        }
-    }
-
-    public List<KeyValuePair<string, object>> Effects {
-        get {
-            return effects;
-        }
-    }
-
-    public abstract void reset();
-
-    public abstract bool isDone();
+    public abstract bool IsDone();
 
     public abstract bool IsSucc();
 
-    public abstract bool checkProceduralPrecondition(List<KeyValuePair<string, object>> state);
+    public abstract bool IsActionUsable(List<KeyValuePair<string, object>> state);
 
-    public abstract void perform(GameObject agent);
-
-    public abstract bool requiresInRange();
-
-
-
-
+    public abstract void DoAction(GameObject agent);
 }
