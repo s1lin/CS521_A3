@@ -34069,7 +34069,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1330553757}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.693835, y: 0.088644065, z: 230.11452}
+  m_LocalPosition: {x: -0.44, y: 0.088644065, z: 230.11452}
   m_LocalScale: {x: 0.22607854, y: 0.21726488, z: 1}
   m_Children: []
   m_Father: {fileID: 2073368336}
@@ -34332,7 +34332,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actionDuration: 0.5
   cost: 1
-  target: -1
+  traderIndex: -1
+  inRange: 0
   inWait: 0
   init: 1
 --- !u!114 &1380932056
@@ -34349,7 +34350,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actionDuration: 0.5
   cost: 1
-  target: -1
+  traderIndex: -1
+  inRange: 0
   inWait: 0
   init: 1
 --- !u!114 &1380932057
@@ -34366,7 +34368,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actionDuration: 0.5
   cost: 1
-  target: -1
+  traderIndex: -1
+  inRange: 0
   inWait: 0
   init: 1
 --- !u!114 &1380932058
@@ -34383,7 +34386,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actionDuration: 0.5
   cost: 1
-  target: -1
+  traderIndex: -1
+  inRange: 0
   inWait: 0
   init: 1
 --- !u!114 &1380932059
@@ -34400,7 +34404,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actionDuration: 0.5
   cost: 1
-  target: -1
+  traderIndex: -1
+  inRange: 0
   inWait: 0
   init: 1
 --- !u!114 &1380932060
@@ -34417,7 +34422,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actionDuration: 0.5
   cost: 1
-  target: -1
+  traderIndex: 5
+  inRange: 0
   inWait: 0
   init: 1
 --- !u!114 &1380932061
@@ -34434,7 +34440,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actionDuration: 0.5
   cost: 1
-  target: -1
+  traderIndex: -1
+  inRange: 0
   inWait: 0
   init: 1
 --- !u!114 &1380932062
@@ -34451,7 +34458,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actionDuration: 0.5
   cost: 1
-  target: -1
+  traderIndex: -1
+  inRange: 0
   inWait: 0
   init: 1
 --- !u!114 &1380932063
@@ -34481,7 +34489,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actionDuration: 0.5
   cost: 1
-  target: -1
+  traderIndex: -1
+  inRange: 0
   inWait: 0
   init: 1
 --- !u!114 &1380932065
@@ -34498,7 +34507,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actionDuration: 0.5
   cost: 1
-  target: -1
+  traderIndex: -1
+  inRange: 0
   inWait: 0
   init: 1
 --- !u!1 &1397433294
@@ -38523,8 +38533,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1897467435}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0.9299998, y: 1.0609999, z: -1}
-  m_LocalScale: {x: 3.4527323, y: 1, z: 2.9258966}
+  m_LocalPosition: {x: 0.84, y: 1.27, z: -1}
+  m_LocalScale: {x: 3.3908594, y: 1, z: 2.8966377}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -38799,7 +38809,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 40bea384314263344abba151f91bae24, type: 2}
+  - {fileID: 2100000, guid: 48a6afc05cade8348955e3fe422fe248, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -38836,8 +38846,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2073368332}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 2, z: -1}
-  m_LocalScale: {x: 4.4232416, y: 4.602677, z: 1}
+  m_LocalPosition: {x: 1.216, y: 2.1, z: -1}
+  m_LocalScale: {x: 4.655844, y: 4.800592, z: 1}
   m_Children:
   - {fileID: 1330553760}
   m_Father: {fileID: 0}

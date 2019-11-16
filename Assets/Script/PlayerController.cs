@@ -29,24 +29,24 @@ public class PlayerController : MonoBehaviour, IGoap {
 
     public PlayerController() {
         globalGoal = new List<KeyValuePair<string, object>> {
-            new KeyValuePair<string, object>("CaTu", 2),
-            new KeyValuePair<string, object>("CaSa", 2),
-            new KeyValuePair<string, object>("CaCa", 2),
+            //new KeyValuePair<string, object>("CaTu", 2),
+            //new KeyValuePair<string, object>("CaSa", 2),
+            //new KeyValuePair<string, object>("CaCa", 2),
             new KeyValuePair<string, object>("CaCi", 2),
-            new KeyValuePair<string, object>("CaCl", 2),
-            new KeyValuePair<string, object>("CaPe", 2),
-            new KeyValuePair<string, object>("CaSu", 2)
+            //new KeyValuePair<string, object>("CaCl", 2),
+            //new KeyValuePair<string, object>("CaPe", 1),
+            //new KeyValuePair<string, object>("CaSu", 1)
         };
 
-        subGoal = new List<KeyValuePair<string, object>> {
-            new KeyValuePair<string, object>("InTu", 2),           
-            new KeyValuePair<string, object>("InSa", 2),          
-            new KeyValuePair<string, object>("InCa", 1),        
-            new KeyValuePair<string, object>("InCi", 1),        
-            new KeyValuePair<string, object>("InCl", 1),        
-            new KeyValuePair<string, object>("InPe", 1),      
-            new KeyValuePair<string, object>("InSu", 1)
-        };
+        //subGoal = new List<KeyValuePair<string, object>> {
+        //    new KeyValuePair<string, object>("CaTu", 2),           
+        //    new KeyValuePair<string, object>("CaSa", 2),          
+        //    //new KeyValuePair<string, object>("CaCa", 2),        
+        //    //new KeyValuePair<string, object>("CaCi", 2),        
+        //    //new KeyValuePair<string, object>("CaCl", 2),        
+        //    //new KeyValuePair<string, object>("CaPe", 1),      
+        //    //new KeyValuePair<string, object>("InSu", 1)
+        //};
     }
 
     void Start() {
@@ -65,9 +65,9 @@ public class PlayerController : MonoBehaviour, IGoap {
             globalGoalText.GetComponent<Text>().text = "Get " + ((int)goal.Value - (int)state.Value) + " " + goal.Key.Substring(2) + " into Caravan.";
             if ((int)state.Value >= ((int)goal.Value)) {
                 index++;
-            } else {
-                KeyValuePair<string, object> sg = subGoal.Find(e => e.Key.Contains(goal.Key.Substring(2)));
-                subGoalText.GetComponent<Text>().text = "Get " + sg.Value + " " + sg.Key.Substring(2) + " into Inventory.";
+            } else {//Happen only if the stuff is stolen or initialize the next goal
+                KeyValuePair<string, object> sg = new KeyValuePair<string, object>(goal.Key, ((int)goal.Value) - (int)state.Value);
+                subGoalText.GetComponent<Text>().text = "Get " + sg.Value + " " + sg.Key.Substring(2) + " into Caravan.";
                 return sg;
             }
         }
@@ -123,7 +123,7 @@ public class PlayerController : MonoBehaviour, IGoap {
             textObject.GetComponent<Text>().text = GoapAgent.Display(a);
         }
         planIndex++;
-
+        Debug.Log(GoapAgent.Display(actions.ToArray()));
     }
 
     public List<KeyValuePair<string, object>> GetWorldState() {

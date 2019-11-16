@@ -21,11 +21,6 @@ public class GoapPlanner {
             return null;
         }
 
-        //Store to Caravan
-        KeyValuePair<string, object> subGoal = new KeyValuePair<string, object>("Ca" + goal.Key.Substring(2), goal.Value);
-        GoapAction actionStore = actionList.Find(e => e.GetType().Name.Equals("InventoryToCar"));
-        BuildGOAP(leaves[leaves.Count - 1], leaves, new List<GoapAction> { actionStore }, subGoal);
-
         Queue<GoapAction> queue = new Queue<GoapAction>();
         foreach (GoapNode a in leaves) {
             queue.Enqueue(a.action);
@@ -43,70 +38,46 @@ public class GoapPlanner {
 
         Debug.Log("Start World:" + GoapAgent.Display(worldState));
 
-        List<GoapAction> usableActions = FindUsableActions(worldState, new List<GoapAction>());
+        List<GoapAction> usableActions = FindUsableActions(worldState, new List<GoapAction>(), goal);
 
         // build graph
         GoapNode start = new GoapNode(null, 0, worldState, null);
-        bool success = false;
-        KeyValuePair<string, object> subGoal;
+        //KeyValuePair<string, object> subGoal;
+        //if (goal.Key.Contains("Su")) {
 
-        if (goal.Key.Contains("Ci")) {
-            subGoal = new KeyValuePair<string, object>("InTu", 2);
-            BuildGOAP(start, leaves, usableActions, subGoal);
-            start = leaves[leaves.Count - 1];
+        //    for (int i = 0; i < 2; i++) {
+        //        subGoal = new KeyValuePair<string, object>("InCa", 2);
+        //        BuildGOAP(start, leaves, usableActions, subGoal);
+        //        start = leaves[leaves.Count - 1];
 
-            subGoal = new KeyValuePair<string, object>("InTu", 4);
-            BuildGOAP(start, leaves, usableActions, subGoal);
-            start = leaves[leaves.Count - 1];
+        //        //Store to Caravan
+        //        subGoal = new KeyValuePair<string, object>("Ca" + subGoal.Key.Substring(2), (int)subGoal.Value * (i + 1));
+        //        GoapAction store = actionList.Find(e => e.GetType().Name.Equals("InventoryToCar"));
+        //        usableActions = new List<GoapAction> { store };
+        //        success = BuildGOAP(start, leaves, usableActions, subGoal);
+        //        start = leaves[leaves.Count - 1];
 
-            GoapAction actionD = actionList.Find(e => e.GetType().Name.Equals("TradeWithD"));
-            usableActions = new List<GoapAction> { actionD };
-        }
+        //        GoapAction actionA = actionList.Find(e => e.GetType().Name.Equals("TradeWithA"));
+        //        usableActions = new List<GoapAction> { actionA };
+        //    }
 
-        if (goal.Key.Contains("Pe")) {
-            subGoal = new KeyValuePair<string, object>("InCi", 1);
-            leaves = DoPlan(leaves, actions, worldState, subGoal);
-            if (leaves.Count > 0) {
-                start = leaves[leaves.Count - 1];
-            } else
-                return new List<GoapNode>();
-        }
+        //    //Take out from Caravan
+        //    subGoal = new KeyValuePair<string, object>("InCa", 4);
+        //    GoapAction take = actionList.Find(e => e.GetType().Name.Equals("CarToInventory"));
+        //    usableActions = new List<GoapAction> { take };
+        //    success = BuildGOAP(start, leaves, usableActions, subGoal);
+        //    start = leaves[leaves.Count - 1];
 
-        if (goal.Key.Contains("Su")) {
+        //    usableActions = new List<GoapAction>();
+        //    foreach (GoapAction a in actions) {
+        //        if (a.IsActionUsable(start.state)) {
+        //            usableActions.Add(a);
+        //            usedActionList.Add(a);
+        //        }
+        //    }
+        //}
 
-            for (int i = 0; i < 2; i++) {
-                subGoal = new KeyValuePair<string, object>("InCa", 2);
-                BuildGOAP(start, leaves, usableActions, subGoal);
-                start = leaves[leaves.Count - 1];
-
-                //Store to Caravan
-                subGoal = new KeyValuePair<string, object>("Ca" + subGoal.Key.Substring(2), (int)subGoal.Value * (i + 1));
-                GoapAction store = actionList.Find(e => e.GetType().Name.Equals("InventoryToCar"));
-                usableActions = new List<GoapAction> { store };
-                success = BuildGOAP(start, leaves, usableActions, subGoal);
-                start = leaves[leaves.Count - 1];
-
-                GoapAction actionA = actionList.Find(e => e.GetType().Name.Equals("TradeWithA"));
-                usableActions = new List<GoapAction> { actionA };
-            }
-
-            //Take out from Caravan
-            subGoal = new KeyValuePair<string, object>("InCa", 4);
-            GoapAction take = actionList.Find(e => e.GetType().Name.Equals("CarToInventory"));
-            usableActions = new List<GoapAction> { take };
-            success = BuildGOAP(start, leaves, usableActions, subGoal);
-            start = leaves[leaves.Count - 1];
-
-            usableActions = new List<GoapAction>();
-            foreach (GoapAction a in actions) {
-                if (a.IsActionUsable(start.state)) {
-                    usableActions.Add(a);
-                    usedActionList.Add(a);
-                }
-            }
-        }
-
-        success = BuildGOAP(start, leaves, usableActions, goal);
+        bool success = BuildGOAP(start, leaves, usableActions, goal, 0);
 
         if (!success) {
             return new List<GoapNode>();
@@ -116,9 +87,10 @@ public class GoapPlanner {
 
     }
 
-    private bool BuildGOAP(GoapNode parent, List<GoapNode> graph, List<GoapAction> usableActions, KeyValuePair<string, object> goal) {
+    private bool BuildGOAP(GoapNode parent, List<GoapNode> graph, List<GoapAction> usableActions, KeyValuePair<string, object> goal, int iteration) {
 
         List<KeyValuePair<string, object>> currentState;
+
 
         foreach (GoapAction action in usableActions) {
 
@@ -137,40 +109,81 @@ public class GoapPlanner {
                 if (IsStateSatisfied(goal, currentState)) {
                     return true;
                 } else {
+                    if (iteration >= 20) {
+                        iteration = 10;
+                        continue;                        
+                    }
+                        
                     List<GoapAction> subset = new List<GoapAction>();
 
-                    subset.AddRange(FindUsableActions(currentState, usableActions));
-                    subset.AddRange(usableActions);
-                    subset.Remove(action);
-                    subset.Add(action);
+                    subset.AddRange(FindUsableActions(currentState, usableActions, goal));
+                    //subset.AddRange(usableActions);
+                    //subset.Remove(action);
+                    //subset.Add(action);
 
-                    return BuildGOAP(node, graph, subset, goal);
+                    return BuildGOAP(node, graph, subset, goal, ++iteration);
                 }
             }
         }
         return false;
     }
 
-    private List<GoapAction> FindUsableActions(List<KeyValuePair<string, object>> currentState, List<GoapAction> exclude) {
+    private List<GoapAction> FindUsableActions(List<KeyValuePair<string, object>> currentState, List<GoapAction> exclude, KeyValuePair<string, object> goal) {
+        
         List<GoapAction> newActions = new List<GoapAction>();
+        List<KeyValuePair<GoapAction, int>> actionPriority = new List<KeyValuePair<GoapAction, int>>();
 
+        int goalS = (int)goal.Value;
+        int invS = (int)currentState.Find(e => e.Key.Equals("In" + goal.Key.Substring(2))).Value;
+        int carS = (int)currentState.Find(e => e.Key.Equals("Ca" + goal.Key.Substring(2))).Value;
+                        
         foreach (GoapAction a in actionList) {
-            if (!exclude.Contains(a) && !usedActionList.Contains(a)) {
-                if (a.IsActionUsable(currentState)) {
-                    newActions.Add(a);
-                    usedActionList.Add(a);
+            if (a.IsActionUsable(currentState)) {
+                List<KeyValuePair<string, object>> actionEffects = a.effects;
+                int potential = 0;
+                if (a.GetType().Name == "InventoryToCar") {
+                    potential += invS;
                 }
+
+                foreach (KeyValuePair<string, object> effect in actionEffects) {
+                    //goalS = goalS.Equals(effect.Key)? (int)goal.Value : 0;
+                    //if (!effect.Key.Equals("Capacity")) {
+                    //    invS = (int)currentState.Find(e => e.Key.Equals("In" + effect.Key.Substring(2))).Value;
+                    //    carS = (int)currentState.Find(e => e.Key.Equals("Ca" + effect.Key.Substring(2))).Value;
+                    //    //
+                    //    potential += (int)effect.Value * Mathf.Max(goalS - invS - carS, 0) + Mathf.Max(goalS - carS, 0);
+
+                    //}
+                    if (effect.Key.Substring(2).Equals(goal.Key.Substring(2)))
+                        potential += (int)effect.Value * Mathf.Max(goalS - invS - carS, 0) + Mathf.Max(goalS - carS, 0);
+                }
+                actionPriority.Add(new KeyValuePair<GoapAction, int>(a, potential));
+                Debug.Log(GoapAgent.Display(a) + ": " + potential);
             }
         }
+        actionPriority.Sort((a, b) => -1 * a.Value.CompareTo(b.Value));//Desc
 
-        foreach (GoapAction a in actionList) {
-            if (!exclude.Contains(a) && !newActions.Contains(a)) {
-                if (a.IsActionUsable(currentState)) {
+
+
+        foreach (KeyValuePair<GoapAction,int> action in actionPriority) {
+            GoapAction a = action.Key;
+            //if (!exclude.Contains(a)) {
+                //if (a.IsActionUsable(currentState)) {
                     newActions.Add(a);
                     usedActionList.Add(a);
-                }
-            }
+                //}
+            //}
         }
+        //newActions.AddRange(exclude);
+        //foreach (KeyValuePair<GoapAction, int> action in actionPriority) {
+        //    GoapAction a = action.Key;
+        //    if (!exclude.Contains(a) && !newActions.Contains(a)) {
+        //        if (a.IsActionUsable(currentState)) {
+        //            newActions.Add(a);
+        //            usedActionList.Add(a);
+        //        }
+        //    }
+        //}
 
         return newActions;
     }

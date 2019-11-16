@@ -31,6 +31,7 @@ class CarToInventory : GoapAction {
 
     public override bool IsActionUsable(List<KeyValuePair<string, object>> state) {
         return false;
+        //return (int)state.Find(e=>e.Key.Equals("Capacity")).Value == 0;
     }
 
     public override bool IsDone() {
