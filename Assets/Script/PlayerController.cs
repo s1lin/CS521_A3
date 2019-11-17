@@ -23,30 +23,18 @@ public class PlayerController : MonoBehaviour, IGoap {
     private int planIndex = 1;
 
     private List<KeyValuePair<string, object>> worldData;
-
-    private List<KeyValuePair<string, object>> subGoal;
     private List<KeyValuePair<string, object>> globalGoal;
 
     public PlayerController() {
         globalGoal = new List<KeyValuePair<string, object>> {
-            //new KeyValuePair<string, object>("CaTu", 2),
-            //new KeyValuePair<string, object>("CaSa", 2),
-            //new KeyValuePair<string, object>("CaCa", 2),
             new KeyValuePair<string, object>("CaCi", 2),
-            //new KeyValuePair<string, object>("CaCl", 2),
-            //new KeyValuePair<string, object>("CaPe", 1),
-            //new KeyValuePair<string, object>("CaSu", 1)
+            new KeyValuePair<string, object>("CaSu", 2),
+            new KeyValuePair<string, object>("CaPe", 2),
+            new KeyValuePair<string, object>("CaCl", 2),
+            new KeyValuePair<string, object>("CaTu", 2),
+            new KeyValuePair<string, object>("CaSa", 2),
+            new KeyValuePair<string, object>("CaCa", 2)
         };
-
-        //subGoal = new List<KeyValuePair<string, object>> {
-        //    new KeyValuePair<string, object>("CaTu", 2),           
-        //    new KeyValuePair<string, object>("CaSa", 2),          
-        //    //new KeyValuePair<string, object>("CaCa", 2),        
-        //    //new KeyValuePair<string, object>("CaCi", 2),        
-        //    //new KeyValuePair<string, object>("CaCl", 2),        
-        //    //new KeyValuePair<string, object>("CaPe", 1),      
-        //    //new KeyValuePair<string, object>("InSu", 1)
-        //};
     }
 
     void Start() {
@@ -76,14 +64,15 @@ public class PlayerController : MonoBehaviour, IGoap {
     }
 
     public void ActionFinished(GoapAction action) {
-        print("action:" + action.GetType().Name + " is finished.");
+        GameObject[] texts = GameObject.FindGameObjectsWithTag("plan_text");
+        Destroy(texts[1]);
     }
     public void GameFinished() {
         winText.GetComponent<Text>().text = "true";
     }
 
     public bool MoveAgent(GoapAction nextAction) {
-       
+
         Vector3 pos;
         if (nextAction.GetType().Name.Equals("InventoryToCar") || nextAction.GetType().Name.Equals("CarToInventory")) {
             pos = caravan.transform.position;
@@ -97,7 +86,7 @@ public class PlayerController : MonoBehaviour, IGoap {
             nextAction.inRange = true;
             return true;
         }
-        
+
         return false;
     }
 

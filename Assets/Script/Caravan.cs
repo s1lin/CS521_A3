@@ -56,6 +56,19 @@ public class Caravan : MonoBehaviour {
         caravanText = GameObject.FindGameObjectWithTag(SpiceNames.ToString(name) + "_c").GetComponent<Text>();
         caravanText.text = "" + value;
     }
+
+    public void PutItem(SpiceName name, int value) {
+        if (items.TryGetValue(name, out int v)) {
+            items.Remove(name);
+            items.Add(name, value + v);
+        } else
+            items.Add(name, value);
+
+        value++;
+        caravanText = GameObject.FindGameObjectWithTag(SpiceNames.ToString(name) + "_c").GetComponent<Text>();
+        caravanText.text = "" + value;
+    }
+
     public void RemoveItemByOne(SpiceName name) {
         int value = 0;
 

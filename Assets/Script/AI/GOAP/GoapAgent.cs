@@ -1,16 +1,13 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System;
 
-
 public sealed class GoapAgent : MonoBehaviour {
 
-    private FSM stateMachine;
-
-    private FSM.FSMState idleState; // finds something to do
-    private FSM.FSMState moveToState; // moves to a target
-    private FSM.FSMState actionState; // performs an action
+    private FSM fsm;
+    private FSM.FSMState idle;  
+    private FSM.FSMState move;  
+    private FSM.FSMState act;
 
     private List<GoapAction> availableActions;
     private Queue<GoapAction> currentActions;
@@ -20,7 +17,7 @@ public sealed class GoapAgent : MonoBehaviour {
     private GoapPlanner planner;
 
     void Start() {
-        stateMachine = new FSM();
+        fsm = new FSM();
         availableActions = new List<GoapAction>();
         currentActions = new Queue<GoapAction>();
         planner = new GoapPlanner();
@@ -32,47 +29,23 @@ public sealed class GoapAgent : MonoBehaviour {
         MoveState();
         ActionState();
 
-        stateMachine.pushState(idleState);
+        fsm.pushState(idle);
 
         LoadActions();
     }
 
 
     void Update() {
-        stateMachine.Update(this.gameObject);
-    }
-
-    public void addAction(GoapAction a) {
-        availableActions.Add(a);
-    }
-
-    public GoapAction getAction(Type action) {
-        foreach (GoapAction g in availableActions) {
-            if (g.GetType().Equals(action))
-                return g;
-        }
-        return null;
-    }
-
-    public void removeAction(GoapAction action) {
-        availableActions.Remove(action);
-    }
-
-    private bool hasActionPlan() {
-        return currentActions.Count > 0;
+        fsm.Update(gameObject);
     }
 
     private void IdleState() {
-        idleState = (fsm, gameObj) => {
-
+        idle = (fsm, gameObj) => {
             List<KeyValuePair<string, object>> worldState = goapAgent.GetWorldState();
 
             KeyValuePair<string, object> goal = goapAgent.GetSubGoals();
-
-            //Debug.Log(prettyPrint(worldState));
-
+            planner.Reset();
             if (!goal.Equals(new KeyValuePair<string, object>())) {
-                // Plan
                 Queue<GoapAction> plan = planner.Plan(availableActions, worldState, goal);
 
                 if (plan != null) {
@@ -80,14 +53,14 @@ public sealed class GoapAgent : MonoBehaviour {
                     currentActions = plan;
                     goapAgent.PlanFound(goal, plan);
 
-                    fsm.popState(); // move to Action state
-                    fsm.pushState(actionState);
+                    fsm.popState();
+                    fsm.pushState(act);
 
                 } else {
 
                     goapAgent.PlanFailed(goal);
-                    fsm.popState(); // move back to IdleAction state
-                    fsm.pushState(idleState);
+                    fsm.popState(); 
+                    fsm.pushState(idle);
                 }
             } else {
                 goapAgent.GameFinished();
@@ -97,10 +70,8 @@ public sealed class GoapAgent : MonoBehaviour {
     }
 
     private void MoveState() {
-        moveToState = (fsm, gameObj) => {
-            // move the game object
+        move = (fsm, gameObj) => {
             GoapAction action = currentActions.Peek();
-            // get the agent to move itself
             if (goapAgent.MoveAgent(action)) {
                 fsm.popState();
             }
@@ -108,16 +79,10 @@ public sealed class GoapAgent : MonoBehaviour {
     }
 
     private void ActionState() {
-
-        actionState = (fsm, gameObj) => {
-            // perform the action
-
-            if (!hasActionPlan()) {
-                // no actions to perform
-                Debug.Log("<color=red>Done actions</color>");
+        act = (fsm, gameObj) => {
+            if (currentActions.Count == 0) {
                 fsm.popState();
-                fsm.pushState(idleState);
-
+                fsm.pushState(idle);
                 return;
             }
 
@@ -127,17 +92,16 @@ public sealed class GoapAgent : MonoBehaviour {
                 if (!action.inWait) {
                     bool success = action.IsSucc();
                     if (!success) {
-                        // action failed, we need to plan again
                         fsm.popState();
-                        fsm.pushState(idleState);
+                        fsm.pushState(idle);
                         goapAgent.PlanAborted(action);
                         action.DoReset();
                         return;
                     }
 
                     if (action.IsDone()) {
-                        // the action is done. Remove it so we can perform the next one
                         action.DoReset();
+                        goapAgent.ActionFinished(action);
                         currentActions.Dequeue();
                     }
                 } else {
@@ -145,19 +109,18 @@ public sealed class GoapAgent : MonoBehaviour {
                 }                                            
             }
 
-            if (hasActionPlan()) {
-                // perform the next action             
+            if (currentActions.Count > 0) {       
                 action = currentActions.Peek();
 
                 if (action.IsInRange()) {
                     action.DoAction(gameObj);
                     action.init = false;
                 } else
-                    fsm.pushState(moveToState);           
+                    fsm.pushState(move);           
 
             } else {
                 fsm.popState();
-                fsm.pushState(idleState);
+                fsm.pushState(idle);
             }
 
 
@@ -182,26 +145,26 @@ public sealed class GoapAgent : MonoBehaviour {
     }
 
     public static string Display(List<KeyValuePair<string, object>> state) {
-        String s = "";
-        foreach (KeyValuePair<string, object> kvp in state) {
-            s += kvp.Key + ":" + kvp.Value.ToString();
-            s += ", ";
+        String text = "";
+        foreach (KeyValuePair<string, object> s in state) {
+            text += s.Key + ":" + s.Value.ToString();
+            text += ", ";
         }
-        return s;
+        return text;
     }
 
     public static string Display(GoapAction[] actions) {
-        String s = "";
+        String text = "";
         foreach (GoapAction a in actions) {
-            s += a.GetType().Name;
-            s += "-> ";
+            text += a.GetType().Name;
+            text += "-> ";
         }
-        s += "GOAL";
-        return s;
+        text += "GOAL";
+        return text;
     }
 
     public static string Display(GoapAction action) {
-        String s = "" + action.GetType().Name;
-        return s;
+        String text = "" + action.GetType().Name;
+        return text;
     }
 }

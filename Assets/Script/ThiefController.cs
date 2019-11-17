@@ -36,13 +36,12 @@ public class ThiefController : MonoBehaviour {
     void Update() {
         if (stealCount >= 2) {
             Wondering();
-        }else if (!inWait && isActionFinished) {
+        } else if (!inWait && isActionFinished) {
             StartCoroutine("Action");
         } else {
             if (isWondering) {
                 Wondering();
-            }                
-            else {
+            } else {
                 if (isCaravan) {
                     if (MoveToCaravan() && !isActionFinished) {
                         isActionFinished = StealRandomItemFromCar();

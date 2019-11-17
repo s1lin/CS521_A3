@@ -7,6 +7,10 @@ class CarToInventory : GoapAction {
     private bool isSucc = false;
     private bool isFinished = false;
 
+    public CarToInventory() {
+        AddEffect("Capacity", 0);
+    }
+
     public override void DoAction(GameObject agent) {
         StartCoroutine(Action(agent));
     }
@@ -29,9 +33,17 @@ class CarToInventory : GoapAction {
         isSucc = succ;
     }
 
+    //Will not be used unless there are an infinite loop
     public override bool IsActionUsable(List<KeyValuePair<string, object>> state) {
+        if ((int)state.Find(e => e.Key.Equals("Capacity")).Value != 4)
+            return false;
+        foreach (KeyValuePair<string, object>s in state) {
+            if (s.Key.Contains("Ca")) {
+                if ((int)s.Value > 8)
+                    return true;
+            }
+        }
         return false;
-        //return (int)state.Find(e=>e.Key.Equals("Capacity")).Value == 0;
     }
 
     public override bool IsDone() {
