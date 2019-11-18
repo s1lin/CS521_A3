@@ -27,9 +27,9 @@ public class PlayerController : MonoBehaviour, IGoap {
 
     public PlayerController() {
         globalGoal = new List<KeyValuePair<string, object>> {
-            new KeyValuePair<string, object>("CaCi", 2),
-            new KeyValuePair<string, object>("CaSu", 2),
+            new KeyValuePair<string, object>("CaCi", 2),            
             new KeyValuePair<string, object>("CaPe", 2),
+            new KeyValuePair<string, object>("CaSu", 2),
             new KeyValuePair<string, object>("CaCl", 2),
             new KeyValuePair<string, object>("CaTu", 2),
             new KeyValuePair<string, object>("CaSa", 2),
